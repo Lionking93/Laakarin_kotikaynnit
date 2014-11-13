@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>MediHome-ajanvarausjärjestelmä</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="../css/bootstrap.css" rel="stylesheet">
+        <link href="../css/bootstrap-theme.css" rel="stylesheet">
+        <link href="../css/main.css" rel="stylesheet">
+        <script src="../js/jquery-1.11.1.min.js"></script>
+    </head> 
+    <body>
+        <p>Asiakastili</p>
+        <div class="row">
+            <div class="col-xs-10"><h2>MediHome-lääkärien kotikäyntien varaus</h2></div>
+            <div class="col-xs-2" id="kirjautuminen"><a href="kirjautuminen.html" class="btn btn-default">Kirjaudu ulos</a></div>
+        </div>
+        <br/>
+        <div class="tabbable">
+            <ul class="nav-tabs nav">
+                <li class="active"><a href="#omat_varaukset" data-toggle="tab" class="tabit">Omat varaukset</a></li>
+                <li class=""><a href="#viikkoaikataulu" data-toggle="tab" class="tabit">Viikkoaikataulu</a></li>
+                <li class=""><a href="#hoito_ohjeet" data-toggle="tab" class="tabit">Hoito-ohjeet</a></li>
+            </ul>
+            <div class="tab-content">
+                <div id="viikkoaikataulu" class="tab-pane">
+                    <table class="table table-bordered">
+                        <tr>
+                            <td colspan="6"><b>Varatut ajat on merkitty punaisella ja vapaat vihreällä. Valitse itsellesi sopiva lääkäriaika 
+                                    painamalla vihreätä viikkoaikatalun saraketta.</b></td>
+                        </tr>
+                        <tr>
+                            <th>#</th>
+                            <th>Maanantai</th>
+                            <th>Tiistai</th>
+                            <th>Keskiviikko</th>
+                            <th>Torstai</th>
+                            <th>Perjantai</th>
+                        </tr>
+                        <tr>
+                            <td>08:00-08:45</td>
+                            <td></td>
+                            <td class="vapaa">
+                                <div class="dropdown dropdown-vapaa">
+                                    <div class="dropdown-toggle" id="dropdownvalikko"
+                                         data-toggle="dropdown">Pentti Virtanen
+                                    </div>
+                                    <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownvalikko">
+                                        <li role="presentation"><table>
+                                                <tr>
+                                                    <th>Hoitava lääkäri:</th>
+                                                    <td> Pentti Virtanen</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Varattu aika:</th>
+                                                    <td> 08:00-08:45</td>
+                                                </tr>
+                                            </table>
+                                        </li>
+                                        <li role="presentation"><a role="menuitem" href="#" class="btn btn-default">Varaa aika</a></li>
+                                    </ul>
+                                </div>
+                            </td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>09:00-09:45</td>
+                            <td></td>
+                            <td></td>
+                            <td class="varattu">Pentti Virtanen</td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>10:00-10:45</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>11:00-11:45</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>12:00-12:45</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>13:00-13:45</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>14:00-14:45</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>15:00-15:45</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </table>
+                </div>
+                <div id="omat_varaukset" class="tab-pane active">
+                    <table class="table table-striped">
+                        <tr>
+                            <th>Vastaava lääkäri</th>
+                            <th>Varauksen ajankohta</th>
+                        </tr>
+                        <tr>
+                            <td>Pentti Virtanen</td>
+                            <td>Ke 19.11.2014, 09:00-09:45</td>
+                        </tr>
+                    </table>
+                </div>
+                <div id="hoito_ohjeet" class="tab-pane">
+                    <table class="table table-striped">
+                        <tr>
+                            <th>Vastaava lääkäri</th>
+                            <th>Lisäysaika</th>
+                            <th>Hoito-ohje</th>
+                        </tr>
+                        <tr>
+                            <td>Pentti Virtanen</td>
+                            <td>5.11.2014, 15:03</td>
+                            <td>Riittävästi lepoa ja kevyitä ruokia</td>
+                        </tr>
+                        <tr>
+                            <td>Pentti Virtanen</td>
+                            <td>8.11.2014, 16:15</td>
+                            <td>2*400 mg Buranaa</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <script src="../js/bootstrap.js"></script>
+    </body>
+</html>

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>MediHome-ajanvarausjärjestelmä</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="../css/bootstrap.css" rel="stylesheet">
+        <link href="../css/bootstrap-theme.css" rel="stylesheet">
+        <link href="../css/main.css" rel="stylesheet">
+        <script src="../js/jquery-1.11.1.min.js"></script>
+    </head>
+    <body>
+        <p>Lääkäritili</p>
+        <div class="row">
+            <div class="col-xs-10"><h2>MediHome-lääkärien kotikäyntien varaus</h2></div>
+            <div class="col-xs-2" id="kirjautuminen"><a href="kirjautuminen.html" class="btn btn-default">Kirjaudu ulos</a></div>
+        </div>
+        <br/>
+        <div class="tabbable">
+            <ul class="nav nav-tabs">
+                <li class="active"><a href="#tyotehtavat" data-toggle="tab" class="tabit">Työtehtävät</a></li>
+                <li class=""><a href="#viikkoaikataulu" data-toggle="tab" class="tabit">Viikkoaikataulu</a></li>
+                <li class=""><a href="#potilaat" data-toggle="tab" class="tabit">Potilaat</a></li>
+            </ul>
+            <div class="tab-content">
+                <div id="viikkoaikataulu" class="tab-pane">
+                    <table class="table table-bordered">
+                        <tr>
+                            <th>#</th>
+                            <th>Maanantai</th>
+                            <th>Tiistai</th>
+                            <th>Keskiviikko</th>
+                            <th>Torstai</th>
+                            <th>Perjantai</th>
+                        </tr>
+                        <tr>
+                            <td>08:00-08:45</td>
+                            <td></td>
+                            <td>Pentti Virtanen
+                            </td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>09:00-09:45</td>
+                            <td></td>
+                            <td></td>
+                            <td>Pentti Virtanen</td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>10:00-10:45</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>11:00-11:45</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>12:00-12:45</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>13:00-13:45</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>14:00-14:45</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>15:00-15:45</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </table>
+                </div>
+                <div id="tyotehtavat" class="tab-pane active">
+                    <table class="table table-bordered">
+                        <tr>
+                            <td colspan="6"><b>Alla on merkitty suoritetut työtehtävät vihreällä ja kuittaamattomat punaisella. 
+                                Suoritettuasi työtehtävän, kuittaa suoritus painamalla kyseistä työtehtävää vastaavaa 
+                                viikkoaikataulun saraketta.</b></td> 
+                        </tr>
+                        <tr>
+                            <th>#</th>
+                            <th>Maanantai</th>
+                            <th>Tiistai</th>
+                            <th>Keskiviikko</th>
+                            <th>Torstai</th>
+                            <th>Perjantai</th>
+                        </tr>
+                        <tr>
+                            <td>08:00-08:45</td>
+                            <td></td>
+                            <td>
+                            </td>
+                            <td></td>
+                            <td></td>
+                            <td class="kuittaamaton">
+                                <div class="dropdown dropdown-kuittaamaton">
+                                    <div class="dropdown-toggle" id="dropdownvalikko" data-toggle="dropdown">
+                                        Asko Seppälä
+                                    </div>
+                                    <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownvalikko">
+                                        <li role="presentation">
+                                            <table>
+                                                <tr>
+                                                    <th>Nimi: </th>
+                                                    <td>Asko Sepppälä</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Asiakastunnus: </th>
+                                                    <td>0058</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Ajankohta: </th>
+                                                    <td>08:00-08:45</td>
+                                                </tr>
+                                            </table>
+                                        </li>
+                                        <li role="presentation">
+                                            <a href="luo_potilastieto.html" class="btn btn-default">Kuittaa suoritetuksi</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>09:00-09:45</td>
+                            <td></td>
+                            <td class="kuitattu">Jouko Sihvonen</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>10:00-10:45</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>11:00-11:45</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>12:00-12:45</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>13:00-13:45</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>14:00-14:45</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>15:00-15:45</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </table>
+                </div>
+                <div id="potilaat" class="tab-pane">
+                    <table class="table table-striped">
+                        <tr>
+                            <th>Nimi</th>
+                            <th colspan="2">Asiakastunnus</th>
+                        </tr>
+                        <tr>
+                            <td>Asko Seppälä</td>
+                            <td>0058</td>
+                            <td><a href="potilaan_tiedot.html" class="btn btn-default">Avaa potilaan tiedot</a></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <script src="../js/bootstrap.js"></script>
+    </body>
+</html>
