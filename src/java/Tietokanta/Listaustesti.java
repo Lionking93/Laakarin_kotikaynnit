@@ -17,11 +17,11 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author leo
  */
-public class Servletti extends HttpServlet {
+public class Listaustesti extends HttpServlet {
 
     private final List<Asiakas> asiakkaat;
     
-    public Servletti() throws SQLException, NamingException {
+    public Listaustesti() throws SQLException, NamingException {
         asiakkaat = Asiakas.getAsiakkaat();
     }
     /**
@@ -75,9 +75,9 @@ public class Servletti extends HttpServlet {
         try {
             processRequest(request, response);
         } catch (SQLException ex) {
-            Logger.getLogger(Servletti.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Listaustesti.class.getName()).log(Level.SEVERE, null, ex);
         } catch (NamingException ex) {
-            Logger.getLogger(Servletti.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Listaustesti.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -95,9 +95,9 @@ public class Servletti extends HttpServlet {
         try {
             processRequest(request, response);
         } catch (SQLException ex) {
-            Logger.getLogger(Servletti.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Listaustesti.class.getName()).log(Level.SEVERE, null, ex);
         } catch (NamingException ex) {
-            Logger.getLogger(Servletti.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Listaustesti.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

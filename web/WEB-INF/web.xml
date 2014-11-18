@@ -6,7 +6,7 @@
     </servlet>
     <servlet>
         <servlet-name>Servletti</servlet-name>
-        <servlet-class>Tietokanta.Servletti</servlet-class>
+        <servlet-class>Tietokanta.Listaustesti</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>NewServlet</servlet-name>
