@@ -1,0 +1,118 @@
+<html>
+<head>
+	<title>Tietokohteet</title>
+	<meta charset="UTF-8">
+	<link href="main.css" rel="stylesheet">
+</head>
+<body>
+	<h1>Tietokohde: Asiakas</h1>
+	<table border="1" cellpadding="3" width="800px">
+		<tr>
+			<th>Attribuutti</th>
+			<th>Arvojoukko</th>
+			<th>Kuvailu</th>
+		</tr>
+		<tr>
+			<td>Nimi</td>
+			<td>Merkkijono, max 50 merkkiä.</td>
+			<td>Asiakkaan nimi muodossa Etunimi Toiset_nimet Sukunimi, 
+			esim. Pentti Virtanen</td>
+		</tr>
+		<tr>
+			<td>Syntymäaika</td>
+			<td>Päivämäärä</td>
+			<td>Syntymäaika muodossa DD.MM.YYYY Esim. 03.08.1957</td>
+		</tr>
+		<tr>
+			<td>Henkilötunnus</td>
+			<td>Merkkijono, 11 merkkiä.</td>
+			<td>Suomalainen henkilötunnus, joka on siis muodossa DDMMYY-XXX, 
+			eli esim. 220998-434P.</td>
+		</tr>
+		<tr>
+			<td>Osoite</td>
+			<td>Merkkijono, max 75 kirjainta.</td>
+			<td>Osoite muodossa Katuosoite Rapun_numero Oven_numero, Postinumero Postitoimipaikka. 
+			Esim. Taivaanvuohentie 5 A 24, 00200 Helsinki</td>
+		</tr>
+	</table>
+	<p class="kappale">Yhdellä asiakkaalla voi olla monta ajanvarausta. Yhtä asiakasta kohden voi olla yksi tai 		useampia lääkäreiden kirjoittamia potilasraportteja ja hoito-ohjeita. Yhtä asiakasta kohden voi olla yksi tai 
+useampia lääkäreitä, jotka suorittavat kotikäyntejä. Asiakkaiden tunnistamiseen kuitenkin käytetään automaattigeneroitua id-avainta, koska esim. maahanmuuttajilla ei henkilötunnusta 
+	välttämättä ole.</p>
+	<h1>Tietokohde: Lääkäri</h1>
+	<table border="1" cellpadding="3" width="800px">
+		<tr>
+			<th>Attribuutti</th>
+			<th>Arvojoukko</th>
+			<th>Kuvailu</th>			
+		</tr>	
+		<tr>
+			<td>Nimi</td>
+			<td>Merkkijono, max 50 merkkiä.</td>
+			<td>Lääkärin nimi muodossa Etunimi Sukunimi, esim. Maarit Salmela.</td>
+		</tr>
+	</table>
+	<p class="kappale">Yhtä lääkäriä kohden voi olla yksi tai useampia varattuja aikoja, jotka ovat siis lääkärin työtehtäviä eli asiakkaita, joita lääkäri tapaa. Yhtä lääkäriä kohden voi olla useita asiakkaita, joille lääkäri kirjoittaa potilasraportteja ja hoito-ohjeita. Lääkärille automaattigeneroidaan id-avain.</p>
+	<h1>Tietokohde: Potilasraportti</h1>
+	<table border="1" cellpadding="3" width="800px">
+		<tr>
+			<th>Attribuutti</th>
+			<th>Arvojoukko</th>
+			<th>Kuvailu</th>
+		</tr>
+		<tr>
+			<td>Lisäysajankohta</td>
+			<td>Timestamp</td>
+			<td>Aika jolloin uusi, tai muokattu potilasraportti on lisätty järjestemään. 
+			Lisäysajankohta voisi olla esimerkiksi 15.11.2014 15:03</td>
+		</tr>
+		<tr>
+			<td>Potilasraportti</td>
+			<td>Merkkijono, max 4000 merkkiä.</td>
+			<td>Teksti, jossa lääkäri kuvailee kotikäyntiään potilaan luona. Hän esim. kuvailee 
+			potilaan oireita ja kertoo millaista lääkitystä on määrännyt.</td>
+		</tr>
+	</table>
+	<p class="kappale">Potilasraportti on asiakaskohtainen. Usealla asiakkaalla ei siis voi olla samaa potilasraporttia. Toisaalta potilasraporttia ei voi olla olemassa ilman asiakasta. Jos asiakas poistaa tunnuksensa, potilasraportitkin katoavat.</p>
+	<h1>Tietokohde: Hoito-ohje</h1>
+	<table border="1" cellpadding="3" width="800px">
+		<tr>
+			<th>Attribuutti</th>
+			<th>Arvojoukko</th>
+			<th>Kuvailu</th>
+		</tr>
+		<tr>
+			<td>Lisäysajankohta</td>
+			<td>Timestamp</td>
+			<td>Aika jolloin uusi, tai muokattu potilasraportti on lisätty järjestemään. 
+			Lisäysajankohta voisi olla esimerkiksi 15.11.2014 15:03</td>
+		</tr>
+		<tr>
+			<td>Hoito-ohje</td>
+			<td>Merkkijono, max 4000 merkkiä.</td>
+			<td>Teksti, jossa lääkäri kuvailee toimenpiteitä, joita potilaan tulisi suorittaa oireidensa lievittämiseksi. Hoito-ohjeessa lääkäri saattaa myös antaa ohjeita mahdollisten lääkeaineiden oikeaoppiseksi käyttämiseksi, kuten käyttömäärä tai käyttötiheys.</td>
+		</tr>	
+	</table>
+	<p class="kappale">Hoito-ohjeet ovat potilaskohtaisia. Samaa ohjetta ei voi olla useammalla potilaalla. Hoito-ohjeet ovat myös potilasriippuvaisia, eli potilaan poistaessa tunnuksensa palvelusta, hoito-ohjeet katoavat.</p>
+	<h1>Tietokohde: Varattava aika</h1>
+	</table>
+	<table border="1" cellpadding="3" width="800px">
+		<tr>
+			<th>Attribuutti</th>
+			<th>Arvojoukko</th>
+			<th>Kuvailu</th>
+		</tr>
+		<tr>
+			<td>Viikonpäivä</td>
+			<td>Date</td>
+			<td>Päivämäärä muodossa DD.MM.YYYY, esim 12.11.2014.</td>
+		</tr>
+		<tr>
+			<td>Varattava aika</td>
+			<td>Merkkijono, jossa on 11 merkkiä</td>
+			<td>Lukujärjestyksessä näkyvä 45 minuuttia pitkä varattava aika, esimerkiksi 08:00-08:45.</td>
+		</tr>
+	<p class="kappale">Varattava aika -taulun rivin yksilöi viikonpäivästä ja varattavasta ajasta muodostettava avain. Jokaisella taulun rivilä täytyy viitata yhteen lääkäriin, potilaaseen voidaan viitata. Yhtä varattua aikaa kohden voi olla maksimissaan vain yksi lääkäri ja yksi potilas mutta yhtä lääkäriä tai yhtä asiakasta kohden voi olla useita varattuja aikoja.</p>
+	</table>
+</body>
+</html>
