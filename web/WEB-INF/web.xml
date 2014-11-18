@@ -5,7 +5,7 @@
         <servlet-class>Tietokanta.SQLTesti2</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>Servletti</servlet-name>
+        <servlet-name>Listaustesti</servlet-name>
         <servlet-class>Tietokanta.Listaustesti</servlet-class>
     </servlet>
     <servlet>
@@ -17,8 +17,8 @@
         <url-pattern>/SQLTesti2</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>Servletti</servlet-name>
-        <url-pattern>/Servletti</url-pattern>
+        <servlet-name>Listaustesti</servlet-name>
+        <url-pattern>/Listaustesti</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>NewServlet</servlet-name>
