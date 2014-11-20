@@ -1,29 +1,23 @@
-package Kokeilut;
+package Servletit;
 
 import Mallit.Asiakas;
+import Mallit.Kayttaja;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.naming.NamingException;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  *
  * @author leo
  */
-public class Listaustesti extends HttpServlet {
+public class EmoServlet extends HttpServlet {
 
-    private final List<Asiakas> asiakkaat;
-    
-    public Listaustesti() throws SQLException, NamingException {
-        asiakkaat = Asiakas.getAsiakkaat();
-    }
+    private Kayttaja kayttaja;
+
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -32,32 +26,11 @@ public class Listaustesti extends HttpServlet {
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
-     * @throws java.sql.SQLException
-     * @throws javax.naming.NamingException
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException, SQLException, NamingException {
-
-        PrintWriter out = response.getWriter();
+            throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
 
-        try {
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Asiakassivu</title>");
-            out.println("</head>");
-            out.println("<body>");
-            for (Asiakas asiakas : asiakkaat) {
-                out.println("<li>" + asiakas.getNimi() + "</li>");
-            }
-            out.println("</body>");
-            out.println("</html>");
-        } catch (Exception e) {
-            System.out.println(e);
-        } 
-        finally {
-            out.close();
-        }
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
@@ -72,13 +45,7 @@ public class Listaustesti extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        try {
-            processRequest(request, response);
-        } catch (SQLException ex) {
-            Logger.getLogger(Listaustesti.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (NamingException ex) {
-            Logger.getLogger(Listaustesti.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        processRequest(request, response);
     }
 
     /**
@@ -92,13 +59,7 @@ public class Listaustesti extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        try {
-            processRequest(request, response);
-        } catch (SQLException ex) {
-            Logger.getLogger(Listaustesti.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (NamingException ex) {
-            Logger.getLogger(Listaustesti.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        processRequest(request, response);
     }
 
     /**
@@ -111,4 +72,33 @@ public class Listaustesti extends HttpServlet {
         return "Short description";
     }// </editor-fold>
 
+    protected void naytaSivu(HttpServletRequest request, HttpServletResponse response, String sivunNimi) throws ServletException, IOException {
+        RequestDispatcher dispatcher = request.getRequestDispatcher(sivunNimi);
+        dispatcher.forward(request, response);
+    }
+
+    protected void asetaVirhe(String virhe, HttpServletRequest request) {
+        request.setAttribute("virheViesti", virhe);
+    }
+
+    protected Kayttaja getKayttaja() {
+        return kayttaja;
+    }
+
+    protected void kirjauduUlos(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        session.removeAttribute("kirjautunut");
+        response.sendRedirect("login");
+    }
+
+    protected boolean onkoKirjautunut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        kayttaja = (Kayttaja) session.getAttribute("kirjautunut");
+        if (kayttaja != null) {
+            return true;
+        } else {
+            naytaSivu(request, response, "web/kirjautuminen.jsp");
+            return false;
+        }
+    }
 }

@@ -1,29 +1,19 @@
-package Kokeilut;
+package Servletit;
 
 import Mallit.Asiakas;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.naming.NamingException;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  *
  * @author leo
  */
-public class Listaustesti extends HttpServlet {
+public class AsiakasServlet extends EmoServlet {
 
-    private final List<Asiakas> asiakkaat;
-    
-    public Listaustesti() throws SQLException, NamingException {
-        asiakkaat = Asiakas.getAsiakkaat();
-    }
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -32,31 +22,27 @@ public class Listaustesti extends HttpServlet {
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
-     * @throws java.sql.SQLException
-     * @throws javax.naming.NamingException
      */
+    @Override
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException, SQLException, NamingException {
-
-        PrintWriter out = response.getWriter();
+            throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
 
-        try {
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Asiakassivu</title>");
-            out.println("</head>");
-            out.println("<body>");
-            for (Asiakas asiakas : asiakkaat) {
-                out.println("<li>" + asiakas.getNimi() + "</li>");
+        /* TODO output your page here. You may use following sample code. */
+        if (request.getParameter("kirjauduUlos") != null) {
+            kirjauduUlos(request, response);
+        } else if (onkoKirjautunut(request, response)) {
+            String kayttajanNimi = getKayttaja().getNimi();
+            request.setAttribute("kayttajanNimi", kayttajanNimi);
+            if (request.getParameter("ekaTab") != null) {
+                naytaSivu(request, response, "web/omatVaraukset.jsp");
+            } else if (request.getParameter("tokaTab") != null) {
+                naytaSivu(request, response, "web/viikkoaikataulu.jsp");
+            } else if (request.getParameter("kolmasTab") != null) {
+                naytaSivu(request, response, "web/hoitoOhjeet.jsp");
+            } else {
+                naytaSivu(request, response, "web/omatVaraukset.jsp");
             }
-            out.println("</body>");
-            out.println("</html>");
-        } catch (Exception e) {
-            System.out.println(e);
-        } 
-        finally {
-            out.close();
         }
     }
 
@@ -72,13 +58,7 @@ public class Listaustesti extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        try {
-            processRequest(request, response);
-        } catch (SQLException ex) {
-            Logger.getLogger(Listaustesti.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (NamingException ex) {
-            Logger.getLogger(Listaustesti.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        processRequest(request, response);
     }
 
     /**
@@ -92,13 +72,7 @@ public class Listaustesti extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        try {
-            processRequest(request, response);
-        } catch (SQLException ex) {
-            Logger.getLogger(Listaustesti.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (NamingException ex) {
-            Logger.getLogger(Listaustesti.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        processRequest(request, response);
     }
 
     /**

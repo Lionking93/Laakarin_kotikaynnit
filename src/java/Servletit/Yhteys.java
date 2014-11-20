@@ -1,4 +1,4 @@
-package Tietokanta;
+package Servletit;
 
 import java.sql.Connection;
 import java.sql.SQLException;
