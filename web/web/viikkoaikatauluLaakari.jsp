@@ -8,8 +8,8 @@
 <%@taglib prefix="t" tagdir="/WEB-INF/tags" %>
 <t:pohja kenenTili="Lääkäri" aktiivinenTokaTab="active" ekaTab="Työtehtävät" tokaTab="Viikkoaikataulu" kolmasTab="Potilaat">
     <div class="tab-pane active">
-        <t:lukujarjestys infoteksti="Alla näet lääkärien vastaanottoajat tällä viikolla.">
+        <t:lukujarjestysLaakari infoteksti="Alla näet lääkärien vastaanottoajat tällä viikolla.">
 
-        </t:lukujarjestys>
+        </t:lukujarjestysLaakari>
     </div>
 </t:pohja>

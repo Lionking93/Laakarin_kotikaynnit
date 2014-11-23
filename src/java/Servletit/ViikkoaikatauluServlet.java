@@ -1,24 +1,24 @@
 package Servletit;
 
-import Mallit.Asiakas;
+import Mallit.Laakari;
 import Mallit.VarattavaAika;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.naming.NamingException;
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 /**
  *
  * @author leo
  */
-public class AsiakasServlet extends EmoServlet {
+public class ViikkoaikatauluServlet extends AsiakasServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -33,38 +33,21 @@ public class AsiakasServlet extends EmoServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-
-        /* Erilaisten nappien painallukset. Mitä tapahtuu, kun kirjautuu ulos tai painaa eri päävalikon tabeja. */
+        try {
+            asetaPaivatViikkoaikatauluun(request);
+            asetaLaakaritViikkoaikatauluun(request);
+        } catch (Exception e) {
+            naytaVirheSivu("Tiedon hakeminen tietokannasta epäonnistui.", request, response);
+        }
         if (kirjaudutaankoUlos(request)) {
             kirjauduUlos(request, response);
         } else if (onkoKirjautunut(request, response)) {
-            avaaSivunakyma(request, response, "web/omatVaraukset.jsp");
-        }
-    }
-
-    protected boolean kirjaudutaankoUlos(HttpServletRequest request) {
-        return request.getParameter("kirjauduUlos") != null;
-    }
-
-    protected void asetaSivunKayttajanNimi(HttpServletRequest request) {
-        String kayttajanNimi = getKayttaja().getNimi();
-        request.setAttribute("kayttajanNimi", kayttajanNimi);
-    }
-
-    protected void avaaSivunakyma(HttpServletRequest request, HttpServletResponse response, String oletussivu) throws ServletException, IOException {
-        asetaSivunKayttajanNimi(request);
-        if (request.getParameter("ekaTab") != null) {
-            naytaSivu(request, response, "web/omatVaraukset.jsp");
-        } else if (request.getParameter("tokaTab") != null) {
-            response.sendRedirect("viikkoaikataulu");
-        } else if (request.getParameter("kolmasTab") != null) {
-            naytaSivu(request, response, "web/hoitoOhjeet.jsp");
-        } else {
-            naytaSivu(request, response, oletussivu);
+            avaaSivunakyma(request, response, "web/viikkoaikataulu.jsp");
         }
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
+
     /**
      * Handles the HTTP <code>GET</code> method.
      *
@@ -102,5 +85,17 @@ public class AsiakasServlet extends EmoServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
+
+    public void asetaLaakaritViikkoaikatauluun(HttpServletRequest request) throws SQLException, NamingException {
+        for (int i = 1; i < 9; i++) {
+            List<VarattavaAika> varattavatAjat = VarattavaAika.haeVarattavatLaakarit(i);
+            request.setAttribute("ajat" + i, varattavatAjat);
+        }
+    }
+
+    public void asetaPaivatViikkoaikatauluun(HttpServletRequest request) throws NamingException, SQLException {
+        List<String> paivat = VarattavaAika.haeViikonPaivat();
+        request.setAttribute("paivat", paivat);
+    }
 
 }

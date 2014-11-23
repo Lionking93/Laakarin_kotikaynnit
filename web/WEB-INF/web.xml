@@ -28,6 +28,10 @@
         <servlet-name>LaakariServlet</servlet-name>
         <servlet-class>Servletit.LaakariServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>VarattavaAikaServlet</servlet-name>
+        <servlet-class>Servletit.ViikkoaikatauluServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>SQLTesti2</servlet-name>
         <url-pattern>/SQLTesti2</url-pattern>
@@ -55,6 +59,10 @@
     <servlet-mapping>
         <servlet-name>LaakariServlet</servlet-name>
         <url-pattern>/laakarinetusivu</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>VarattavaAikaServlet</servlet-name>
+        <url-pattern>/viikkoaikataulu</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

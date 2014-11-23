@@ -15,54 +15,40 @@ import javax.naming.NamingException;
  */
 public class Asiakas extends Kayttaja {
 
-    public Asiakas(int id, String nimi, String tunnus, String salasana, String syntymaaika, String henkilotunnus, String osoite) throws NamingException {
-        super.id = id;
-        super.nimi = nimi;
-        super.tunnus = tunnus;
-        super.salasana = salasana;
-        super.syntymaaika = syntymaaika;
-        super.henkilotunnus = henkilotunnus;
-        super.osoite = osoite;
-    }
-
-    public Asiakas() {
+    public Asiakas(int id, String nimi, String tunnus, String salasana, String syntymaaika, String henkilotunnus, String osoite) throws NamingException  {
+        super(id, nimi, tunnus, salasana, syntymaaika, henkilotunnus, osoite);
     }
     
-    public static Asiakas etsiAsiakasTunnuksilla(String username, String password) throws NamingException, SQLException {
-        String sql = "SELECT id, nimi, tunnus, salasana, syntymaaika, henkilotunnus, osoite FROM Asiakas WHERE tunnus = ? AND salasana = ?";
+    public Asiakas(ResultSet rs) throws SQLException {
+        super.id = rs.getInt("id");
+        super.nimi = rs.getString("nimi");
+        super.tunnus = rs.getString("tunnus");
+        super.syntymaaika = rs.getDate("syntymaaika").toString();
+        super.henkilotunnus = rs.getString("henkilotunnus");
+        super.osoite = rs.getString("osoite");
+    }
+    
+    public Asiakas() {}
+    
+    /*Hakee tietokannasta asiakkaan käyttäjätunnuksen ja salasanan perusteella.*/
+    public static Kayttaja etsiAsiakasTunnuksilla(String username, String password) throws NamingException, SQLException {
+        String sql = "SELECT * FROM Asiakas WHERE tunnus = ? AND salasana = ?";
         Yhteys Tietokanta = new Yhteys();
         Connection yhteys = Tietokanta.getYhteys();
         PreparedStatement kysely = yhteys.prepareStatement(sql);
         kysely.setString(1, username);
         kysely.setString(2, password);
-        ResultSet rs = kysely.executeQuery();
         
-        Asiakas kirjautunut = null;
-        
-        if (rs.next()) {
-            kirjautunut = new Asiakas();
-            kirjautunut.setId(rs.getInt("id"));
-            kirjautunut.setNimi(rs.getString("nimi"));
-            kirjautunut.setSalasana(rs.getString("salasana"));
-            kirjautunut.setSyntymaaika(rs.getDate("syntymaaika").toString());
-            kirjautunut.setHenkilotunnus(rs.getString("henkilotunnus"));
-            kirjautunut.setOsoite(rs.getString("osoite"));
-        }
-        try {
-            rs.close();
-        } catch (Exception e) {
-        }
+        Kayttaja kirjautunut = haeKayttaja(kysely, yhteys);
+
         try {
             kysely.close();
-        } catch (Exception e) {
-        }
-        try {
-            yhteys.close();
         } catch (Exception e) {
         }
         return kirjautunut;
     }
 
+    /*Tallentaa kaikki tietokannan asiakas-käyttäjät listaan.*/
     public static List<Asiakas> getAsiakkaat() throws SQLException, NamingException {
         String sql = "SELECT id, nimi, tunnus, salasana, syntymaaika, henkilotunnus, osoite FROM Asiakas";
         Yhteys Tietokanta = new Yhteys();

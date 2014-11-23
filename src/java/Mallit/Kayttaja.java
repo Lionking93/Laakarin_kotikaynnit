@@ -1,6 +1,5 @@
 package Mallit;
 
-import Servletit.Yhteys;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -8,6 +7,7 @@ import java.sql.SQLException;
 import javax.naming.NamingException;
 
 /**
+ * Yliluokka asiakkaalle ja lääkärille.
  *
  * @author leo
  */
@@ -20,6 +20,35 @@ public class Kayttaja {
     protected String syntymaaika;
     protected String henkilotunnus;
     protected String osoite;
+
+    public Kayttaja(int id, String nimi, String tunnus, String salasana, String syntymaaika, String henkilotunnus, String osoite) throws NamingException {
+        this.id = id;
+        this.nimi = nimi;
+        this.tunnus = tunnus;
+        this.salasana = salasana;
+        this.syntymaaika = syntymaaika;
+        this.henkilotunnus = henkilotunnus;
+        this.osoite = osoite;
+    }
+
+    public Kayttaja(ResultSet rs) throws SQLException {
+        this.id = rs.getInt("id");
+        this.nimi = rs.getString("nimi");
+        this.tunnus = rs.getString("tunnus");
+        this.salasana = rs.getString("salasana");
+        /*this.syntymaaika = rs.getDate("syntymaaika").toString();
+         this.osoite = rs.getString("osoite");*/
+    }
+
+    public Kayttaja(int id, String nimi, String tunnus, String salasana) {
+        this.id = id;
+        this.nimi = nimi;
+        this.tunnus = tunnus;
+        this.salasana = salasana;
+    }
+
+    public Kayttaja() {
+    }
 
     public int getId() {
         return this.id;
@@ -77,43 +106,48 @@ public class Kayttaja {
         this.osoite = uusiOsoite;
     }
 
-    public static Kayttaja etsiKayttajaTunnuksilla(String username, String password) throws NamingException, SQLException {
-        String sql = "SELECT id, nimi, tunnus, salasana, syntymaaika, henkilotunnus, osoite FROM asiakas, laakari WHERE tunnus = ? AND salasana = ?";
-        Yhteys Tietokanta = new Yhteys();
-        Connection yhteys = Tietokanta.getYhteys();
-        PreparedStatement kysely = yhteys.prepareStatement(sql);
-        kysely.setString(1, username);
-        kysely.setString(2, password);
+    public static Kayttaja haeKayttaja(PreparedStatement kysely, Connection yhteys) throws SQLException {
         ResultSet rs = kysely.executeQuery();
-
         Kayttaja kayttaja = null;
-        try {
-            if (rs.next()) {
-                kayttaja = new Kayttaja();
-                kayttaja.setId(rs.getInt("id"));
-                kayttaja.setNimi(rs.getString("nimi"));
-                kayttaja.setTunnus(rs.getString("tunnus"));
-                kayttaja.setSalasana(rs.getString("salasana"));
-                kayttaja.setSyntymaaika(rs.getDate("syntymaaika").toString());
-                kayttaja.setHenkilotunnus(rs.getString("henkilotunnus"));
-                kayttaja.setOsoite(rs.getString("osoite"));
-            }
-        } catch (Exception e) {
-            System.out.println(e);
+        if (rs.next()) {
+            kayttaja = new Kayttaja(rs);
+            /*if (onkoAsiakasAttribuutteja(rs)) {
+             asetaAsiakasAttribuutit(rs, kayttaja);
+             }*/
         }
+
         try {
             rs.close();
         } catch (Exception e) {
         }
-        try {
-            kysely.close();
-        } catch (Exception e) {
-        }
+
         try {
             yhteys.close();
         } catch (Exception e) {
         }
 
         return kayttaja;
+    }
+
+    public static void asetaAsiakasAttribuutit(ResultSet rs, Kayttaja k) throws SQLException {
+        k.setHenkilotunnus(rs.getString("henkilotunnus"));
+        k.setOsoite(rs.getString("osoite"));
+        k.setSyntymaaika(rs.getDate("syntymaaika").toString());
+    }
+
+    public static boolean onkoAsiakasAttribuutteja(ResultSet rs) throws SQLException {
+        return onkoSyntymaaikaa(rs) && onkoHenkilotunnusta(rs) && onkoOsoitetta(rs) == true;
+    }
+
+    public static boolean onkoSyntymaaikaa(ResultSet rs) throws SQLException {
+        return rs.getDate("syntymaaika") != null;
+    }
+
+    public static boolean onkoHenkilotunnusta(ResultSet rs) throws SQLException {
+        return rs.getString("henkilotunnus") != null;
+    }
+
+    public static boolean onkoOsoitetta(ResultSet rs) throws SQLException {
+        return rs.getString("osoite") != null;
     }
 }

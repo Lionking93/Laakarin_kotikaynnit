@@ -1,7 +1,13 @@
 package Servletit;
 
+import Mallit.VarattavaAika;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.naming.NamingException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -26,6 +32,16 @@ public class LaakariServlet extends EmoServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
+        
+        try {
+            List<String> paivat = VarattavaAika.haeViikonPaivat();
+
+            request.setAttribute("paivat", paivat);
+        } catch (NamingException ex) {
+            Logger.getLogger(AsiakasServlet.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(AsiakasServlet.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
         if (request.getParameter("kirjauduUlos") != null) {
             kirjauduUlos(request, response);

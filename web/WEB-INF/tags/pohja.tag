@@ -35,14 +35,15 @@
         </div>
         <br/>
         <div class="tabbable">
-            <form>
+            <form method = "POST">
                 <ul class="nav-tabs nav">
-                    <li class="${aktiivinenEkaTab}"><a data-toggle="tab" class="tabit"><input class="btn btn-link" data-toggle="tab" type="submit" name="ekaTab" value="${ekaTab}" /></a></li>
-                    <li class="${aktiivinenTokaTab}"><a data-toggle="tab" class="tabit"><input class="btn btn-link" type="submit" name="tokaTab" value="${tokaTab}" /></a></li>
-                    <li class="${aktiivinenKolmasTab}"><a data-toggle="tab" class="tabit"><input class="btn btn-link" type="submit" name="kolmasTab" value="${kolmasTab}" /></a></li>
+                    <li class="${aktiivinenEkaTab}"><a class="tabit"><input class="btn btn-link" data-toggle="tab" type="submit" name="ekaTab" value="${ekaTab}" /></a></li>
+                    <li class="${aktiivinenTokaTab}"><a class="tabit"><input class="btn btn-link" type="submit" name="tokaTab" value="${tokaTab}" /></a></li>
+                    <li class="${aktiivinenKolmasTab}"><a class="tabit"><input class="btn btn-link" type="submit" name="kolmasTab" value="${kolmasTab}" /></a></li>
                 </ul>
             </form>
             <jsp:doBody/>
         </div>
+            <script src="${pageContext.request.contextPath}/js/bootstrap.js"></script>
     </body>
 </html>

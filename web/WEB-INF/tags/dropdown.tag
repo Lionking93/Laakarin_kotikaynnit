@@ -10,10 +10,7 @@
 <%@attribute name="message"%>
 
 <%-- any content can be specified here e.g.: --%>
-<div class="dropdown dropdown-vapaa">
-    <div class="dropdown-toggle" id="dropdownvalikko"
-         data-toggle="dropdown">Pentti Virtanen
-    </div>
+
     <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownvalikko">
         <li role="presentation">
             <table>
@@ -29,4 +26,3 @@
         </li>
         <li role="presentation"><a role="menuitem" href="#" class="btn btn-default">Varaa aika</a></li>
     </ul>
-</div>

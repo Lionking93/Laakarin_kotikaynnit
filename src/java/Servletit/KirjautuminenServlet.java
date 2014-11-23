@@ -39,11 +39,13 @@ public class KirjautuminenServlet extends EmoServlet {
 
         if (username == null && password == null) {
             naytaSivu(request, response, "web/kirjautuminen.jsp");
+            return;
         }
 
         if (username == null || username.equals("")) {
             asetaVirhe("Et ole syöttanyt käyttäjätunnusta!", request);
             naytaSivu(request, response, "web/kirjautuminen.jsp");
+            return;
         }
 
         request.setAttribute("username", username);
@@ -51,21 +53,24 @@ public class KirjautuminenServlet extends EmoServlet {
         if (password == null || password.equals("")) {
             asetaVirhe("Et ole syöttänyt salasanaa", request);
             naytaSivu(request, response, "web/kirjautuminen.jsp");
+            return;
         }
 
+        /*Tunnistaa kirjautuuko käyttäjä asiakas-tunnuksilla vai lääkäritunnuksilla. Jos ei kumpikaan, mitään ei tapahdu.*/
         try {
-            if (Asiakas.etsiAsiakasTunnuksilla(username, password) != null) {
-                Asiakas kayttaja = Asiakas.etsiAsiakasTunnuksilla(username, password);
-                if (kayttaja != null) {
-                    session.setAttribute("kirjautunut", kayttaja);
-                    response.sendRedirect("asiakkaanetusivu");
-                }
-            } else if (Laakari.etsiLaakariTunnuksilla(username, password) != null) {
-                Laakari kayttaja = Laakari.etsiLaakariTunnuksilla(username, password);
+            if (Laakari.etsiLaakariTunnuksilla(username, password) != null) {
+                Kayttaja kayttaja = Laakari.etsiLaakariTunnuksilla(username, password);
                 if (kayttaja != null) {
                     session.setAttribute("kirjautunut", kayttaja);
                     response.sendRedirect("laakarinetusivu");
                 }
+            } else if (Asiakas.etsiAsiakasTunnuksilla(username, password) != null) {
+                Kayttaja kayttaja = Asiakas.etsiAsiakasTunnuksilla(username, password);
+                if (kayttaja != null) {
+                    session.setAttribute("kirjautunut", kayttaja);
+                    response.sendRedirect("asiakkaanetusivu");
+                }
+
             } else {
                 asetaVirhe("Antamasi käyttäjätunnus tai salasana on väärä.", request);
                 naytaSivu(request, response, "web/kirjautuminen.jsp");
