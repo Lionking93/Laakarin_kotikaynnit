@@ -1,9 +1,17 @@
 package Servletit;
 
 import Mallit.Asiakas;
+import Mallit.HoitoOhje;
+import Mallit.Oirekuvaus;
+import Mallit.Potilasraportti;
+import Mallit.VarattavaAika;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.naming.NamingException;
@@ -35,6 +43,9 @@ public class PotilaanTiedotServlet extends EmoServlet {
         if (onkoKirjautunut(request, response)) {
             try {
                 asetaAsiakkaanTiedot(request);
+                lisaaPotilasraportit(request, response);
+                lisaaHoitoOhjeet(request, response);
+                lisaaOirekuvaukset(request, response);
             } catch (NamingException ex) {
                 Logger.getLogger(PotilaanTiedotServlet.class.getName()).log(Level.SEVERE, null, ex);
             } catch (SQLException ex) {
@@ -100,6 +111,57 @@ public class PotilaanTiedotServlet extends EmoServlet {
         int asiakasId = Integer.parseInt(asiakasIdTeksti);
         Asiakas a = Asiakas.haeAsiakasIdlla(asiakasId);
         return a;
+    }
+
+    public void lisaaPotilasraportit(HttpServletRequest request, HttpServletResponse response) throws NamingException, SQLException, ServletException, IOException {
+        Asiakas a = haeAsiakkaanTiedot(request);
+        try {
+            List<Potilasraportti> l = Potilasraportti.haePotilasraportitAsiakasIdlla(a.getId());
+            List<String> pvm = new ArrayList<String>();
+            for (Potilasraportti p : l) {
+                SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy hh:mm:ss");
+                String muokattava = format.format(p.getLisaysajankohta());
+                pvm.add(muokattava);
+            }
+            request.setAttribute("lisaysajankohdatPotilasraportti", pvm);
+            request.setAttribute("potilasraportit", l);
+        } catch (Exception e) {
+            naytaVirheSivu("Tietokannasta haku epäonnistui", request, response);
+        }
+    }
+
+    public void lisaaHoitoOhjeet(HttpServletRequest request, HttpServletResponse response) throws NamingException, SQLException, ServletException, IOException {
+        Asiakas a = haeAsiakkaanTiedot(request);
+        try {
+            List<HoitoOhje> o = HoitoOhje.haeHoitoOhjeetAsiakasIdlla(a.getId());
+            List<String> pvm = new ArrayList<String>();
+            for (HoitoOhje h : o) {
+                SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy hh:mm:ss");
+                String muokattava = format.format(h.getLisaysajankohta());
+                pvm.add(muokattava);
+            }
+            request.setAttribute("lisaysajankohdatHoitoOhje", pvm);
+            request.setAttribute("hoito_ohjeet", o);
+        } catch (Exception r) {
+            naytaVirheSivu("Tietokannasta haku epäonnistui", request, response);
+        }
+    }
+
+    public void lisaaOirekuvaukset(HttpServletRequest request, HttpServletResponse response) throws NamingException, SQLException, ServletException, IOException {
+        Asiakas a = haeAsiakkaanTiedot(request);
+        try {
+            List<Oirekuvaus> k = Oirekuvaus.haeOirekuvauksetAsiakasIdlla(a.getId());
+            List<String> pvm = new ArrayList<String>();
+            for (Oirekuvaus o : k) {
+                SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy hh:mm:ss");
+                String muokattava = format.format(o.getLisaysajankohta());
+                pvm.add(muokattava);
+            }
+            request.setAttribute("lisaysajankohdatOirekuvaus", pvm);
+            request.setAttribute("oirekuvaukset", k);
+        } catch (Exception r) {
+            naytaVirheSivu("Tietokannasta haku epäonnistui", request, response);
+        }
     }
 
     public boolean palaaEtusivulleNapinPainallus(HttpServletRequest request) {

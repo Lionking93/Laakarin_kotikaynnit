@@ -15,7 +15,7 @@ public class Yhteys {
 
     private DataSource yhteysVarasto;
     
-    public Yhteys() throws NamingException {
+    public Yhteys() throws NamingException, SQLException {
 
         try {
             InitialContext cxt = new InitialContext();

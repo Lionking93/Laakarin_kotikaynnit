@@ -146,7 +146,7 @@ public class OirekuvausServlet extends EmoServlet {
         Oirekuvaus k = new Oirekuvaus();
         k.setId(haeAjanvarauksenId(request));
         k.setLisaysajankohta(luoLisaysajankohta());
-        k.setKuvaus(request.getParameter("oirekuvaus"));
+        k.setLisattavaTeksti(request.getParameter("oirekuvaus"));
         return k;
     }
 

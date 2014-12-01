@@ -14,12 +14,12 @@ import javax.naming.NamingException;
  * @author leo
  */
 public class Asiakas extends Kayttaja {
-
-    public Asiakas(int id, String nimi, String tunnus, String salasana, String syntymaaika, String henkilotunnus, String osoite) throws NamingException  {
+    
+    public Asiakas(int id, String nimi, String tunnus, String salasana, String syntymaaika, String henkilotunnus, String osoite) throws NamingException, SQLException  {
         super(id, nimi, tunnus, salasana, syntymaaika, henkilotunnus, osoite);
     }
     
-    public Asiakas(ResultSet rs) throws SQLException {
+    public Asiakas(ResultSet rs) throws SQLException, NamingException {
         super.id = rs.getInt("id");
         super.nimi = rs.getString("nimi");
         super.tunnus = rs.getString("tunnus");
@@ -28,13 +28,14 @@ public class Asiakas extends Kayttaja {
         super.osoite = rs.getString("osoite");
     }
     
-    public Asiakas() {}
+    public Asiakas() throws NamingException, SQLException {
+    }
     
     /*Hakee tietokannasta asiakkaan käyttäjätunnuksen ja salasanan perusteella.*/
     public static Kayttaja etsiAsiakasTunnuksilla(String username, String password) throws NamingException, SQLException {
         String sql = "SELECT * FROM Asiakas WHERE tunnus = ? AND salasana = ?";
-        Yhteys Tietokanta = new Yhteys();
-        Connection yhteys = Tietokanta.getYhteys();
+        Yhteys conn = new Yhteys();
+        Connection yhteys = conn.getYhteys();
         PreparedStatement kysely = yhteys.prepareStatement(sql);
         kysely.setString(1, username);
         kysely.setString(2, password);
