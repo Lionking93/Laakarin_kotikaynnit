@@ -50,7 +50,7 @@
                             <tr>
                                 <td><c:out value="${lisaysajankohdatOirekuvaus[paikka.index]}" /></td>
                                 <td><c:out value="${oire.lisattavaTeksti}" /></td>
-                                <td></td>
+                                <td><c:if test=""></td>
                                 <td></td>
                             </tr>
                         </c:forEach>
