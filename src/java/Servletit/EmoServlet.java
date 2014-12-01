@@ -3,6 +3,8 @@ package Servletit;
 import Mallit.Asiakas;
 import Mallit.Kayttaja;
 import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.Calendar;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -11,7 +13,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 /**
- *Servlettien overlord-yliluokka.
+ * Servlettien overlord-yliluokka.
+ *
  * @author leo
  */
 public class EmoServlet extends HttpServlet {
@@ -72,15 +75,17 @@ public class EmoServlet extends HttpServlet {
         return "Short description";
     }// </editor-fold>
     /*Tämän yliluokan servletit voivat tämän metodin avulla näyttää eri jsp-sivuja.*/
+
     protected void naytaSivu(HttpServletRequest request, HttpServletResponse response, String sivunNimi) throws ServletException, IOException {
         RequestDispatcher dispatcher = request.getRequestDispatcher(sivunNimi);
         dispatcher.forward(request, response);
     }
     /*Koodi erilaisten virheviestien tuottamiselle.*/
+
     protected void asetaVirhe(String virhe, HttpServletRequest request) {
         request.setAttribute("virheViesti", virhe);
     }
-    
+
     public void naytaVirheSivu(String virheviesti, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         asetaVirhe(virheviesti, request);
         naytaSivu(request, response, "web/sqlVirheSivu.jsp");
@@ -90,12 +95,14 @@ public class EmoServlet extends HttpServlet {
         return kayttaja;
     }
     /*Heittää käyttäjän kirjautumissivulle, kun kirjaudu ulos -painiketta painetaan sekä sulkee istunnon.*/
+
     protected void kirjauduUlos(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
         session.removeAttribute("kirjautunut");
         response.sendRedirect("login");
     }
     /*Tarkistaa onko käyttäjän kirjautuminen onnistunut.*/
+
     protected boolean onkoKirjautunut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
         kayttaja = (Kayttaja) session.getAttribute("kirjautunut");
@@ -105,5 +112,34 @@ public class EmoServlet extends HttpServlet {
             naytaSivu(request, response, "web/kirjautuminen.jsp");
             return false;
         }
+    }
+
+    protected boolean kirjaudutaankoUlos(HttpServletRequest request) {
+        return request.getParameter("kirjauduUlos") != null;
+    }
+
+    protected void asetaSivunKayttajanNimi(HttpServletRequest request) {
+        String kayttajanNimi = getKayttaja().getNimi();
+        request.setAttribute("kayttajanNimi", kayttajanNimi);
+    }
+
+    protected void avaaSivunakyma(HttpServletRequest request, HttpServletResponse response, String ekasivu, String tokasivu, String kolmassivu, String oletussivu) throws ServletException, IOException {
+        asetaSivunKayttajanNimi(request);
+        if (request.getParameter("ekaTab") != null) {
+            response.sendRedirect(ekasivu);
+        } else if (request.getParameter("tokaTab") != null) {
+            response.sendRedirect(tokasivu);
+        } else if (request.getParameter("kolmasTab") != null) {
+            response.sendRedirect(kolmassivu);
+        } else {
+            naytaSivu(request, response, oletussivu);
+        }
+    }
+
+    protected Timestamp luoLisaysajankohta() {
+        Calendar uusiPaiva = Calendar.getInstance();
+        long nykyhetkiMillisekunneissa = uusiPaiva.getTimeInMillis();
+        Timestamp tamaHetki = new Timestamp(nykyhetkiMillisekunneissa);
+        return tamaHetki;
     }
 }

@@ -30,20 +30,23 @@
     <body>
         <p>${kenenTili}</p>
         <div class="row">
-            <div class="col-xs-10"><h2>Hei ${kayttajanNimi}! Tervetuloa käyttämään MediHome-ajanvarausjärjestlemää!</h2></div>
+            <div class="col-xs-10"><h2>Hei ${kayttajanNimi}! Tervetuloa käyttämään MediHome-ajanvarausjärjestelmää!</h2></div>
             <div class="col-xs-2" id="kirjautuminen"><form><button type="submit" name="kirjauduUlos">Kirjaudu ulos</button></form></div>
         </div>
         <br/>
         <div class="tabbable">
-            <form method = "POST">
+            <form>
                 <ul class="nav-tabs nav">
-                    <li class="${aktiivinenEkaTab}"><a class="tabit"><input class="btn btn-link" data-toggle="tab" type="submit" name="ekaTab" value="${ekaTab}" /></a></li>
-                    <li class="${aktiivinenTokaTab}"><a class="tabit"><input class="btn btn-link" type="submit" name="tokaTab" value="${tokaTab}" /></a></li>
+                    <li class="${aktiivinenEkaTab}"><a class="tabit"><input class="btn btn-link" type="submit" name="ekaTab" value="${ekaTab}" /></a></li>
+                        <c:if test="${tokaTab != 'eiole'}">
+                            <li class="${aktiivinenTokaTab}"><a class="tabit"><input class="btn btn-link" type="submit" name="tokaTab" value="${tokaTab}" /></a></li>
+                        </c:if>
                     <li class="${aktiivinenKolmasTab}"><a class="tabit"><input class="btn btn-link" type="submit" name="kolmasTab" value="${kolmasTab}" /></a></li>
+
                 </ul>
             </form>
             <jsp:doBody/>
         </div>
-            <script src="${pageContext.request.contextPath}/js/bootstrap.js"></script>
+        <script src="${pageContext.request.contextPath}/js/bootstrap.js"></script>
     </body>
 </html>

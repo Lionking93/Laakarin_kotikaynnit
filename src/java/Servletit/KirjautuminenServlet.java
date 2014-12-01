@@ -58,17 +58,17 @@ public class KirjautuminenServlet extends EmoServlet {
 
         /*Tunnistaa kirjautuuko käyttäjä asiakas-tunnuksilla vai lääkäritunnuksilla. Jos ei kumpikaan, mitään ei tapahdu.*/
         try {
-            if (Laakari.etsiLaakariTunnuksilla(username, password) != null) {
-                Kayttaja kayttaja = Laakari.etsiLaakariTunnuksilla(username, password);
-                if (kayttaja != null) {
-                    session.setAttribute("kirjautunut", kayttaja);
-                    response.sendRedirect("laakarinetusivu");
-                }
-            } else if (Asiakas.etsiAsiakasTunnuksilla(username, password) != null) {
+            if (Asiakas.etsiAsiakasTunnuksilla(username, password) != null) {
                 Kayttaja kayttaja = Asiakas.etsiAsiakasTunnuksilla(username, password);
                 if (kayttaja != null) {
                     session.setAttribute("kirjautunut", kayttaja);
-                    response.sendRedirect("asiakkaanetusivu");
+                    response.sendRedirect("omatvaraukset");
+                }
+            } else if (Laakari.etsiLaakariTunnuksilla(username, password) != null) {
+                Kayttaja kayttaja = Laakari.etsiLaakariTunnuksilla(username, password);
+                if (kayttaja != null) {
+                    session.setAttribute("kirjautunut", kayttaja);
+                    response.sendRedirect("tyotehtavat");
                 }
 
             } else {

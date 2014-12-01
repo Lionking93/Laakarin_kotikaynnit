@@ -1,6 +1,6 @@
 package Servletit;
 
-import Mallit.VarattavaAika;
+import Mallit.Asiakas;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
@@ -12,12 +12,13 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  *
  * @author leo
  */
-public class LaakariServlet extends EmoServlet {
+public class PotilaatServlet extends EmoServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -32,32 +33,30 @@ public class LaakariServlet extends EmoServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        
-        try {
-            List<String> paivat = VarattavaAika.haeViikonPaivat();
-
-            request.setAttribute("paivat", paivat);
-        } catch (NamingException ex) {
-            Logger.getLogger(LaakariServlet.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SQLException ex) {
-            Logger.getLogger(LaakariServlet.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        if (request.getParameter("kirjauduUlos") != null) {
+        if (kirjaudutaankoUlos(request)) {
             kirjauduUlos(request, response);
         } else if (onkoKirjautunut(request, response)) {
-            String kayttajanNimi = getKayttaja().getNimi();
-            request.setAttribute("kayttajanNimi", kayttajanNimi);
-            if (request.getParameter("ekaTab") != null) {
-                naytaSivu(request, response, "web/tyotehtavat.jsp");
-            } else if (request.getParameter("tokaTab") != null) {
-                naytaSivu(request, response, "laakarinviikkoaikataulu");
-            } else if (request.getParameter("kolmasTab") != null) {
-                naytaSivu(request, response, "web/potilaat.jsp");
+            try {
+                List<Asiakas> asiakkaat = Asiakas.getAsiakkaat();
+                request.setAttribute("asiakkaat", asiakkaat);
+            } catch (SQLException ex) {
+                Logger.getLogger(PotilaatServlet.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (NamingException ex) {
+                Logger.getLogger(PotilaatServlet.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            if (potilaanTiedotNapinPainallus(request)) {
+                HttpSession session = request.getSession();
+                String asiakasId = request.getParameter("asiakasId");
+                session.setAttribute("asiakasId", asiakasId);
+                response.sendRedirect("potilaantiedot");
             } else {
-                naytaSivu(request, response, "web/tyotehtavat.jsp");
+                avaaSivunakyma(request, response, "tyotehtavat", "laakarinviikkoaikataulu", "potilaat", "web/potilaat.jsp");
             }
         }
+    }
+
+    public boolean potilaanTiedotNapinPainallus(HttpServletRequest request) {
+        return request.getParameter("potilaanTiedot") != null;
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

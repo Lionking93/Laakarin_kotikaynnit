@@ -6,18 +6,24 @@
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="t" tagdir="/WEB-INF/tags" %>
-<t:pohja kenenTili="Lääkäri" aktiivinenKolmasTab="active" ekaTab="Työtehtävät" tokaTab="Viikkoaikataulu" kolmasTab="Potilaat">
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<t:pohja kenenTili="Lääkäri" aktiivinenKolmasTab="active" ekaTab="Työtehtävät" tokaTab="eiole" kolmasTab="Potilaat">
     <div id="potilaat" class="tab-pane">
         <table class="table table-striped">
             <tr>
-                <th>Nimi</th>
-                <th colspan="2">Asiakastunnus</th>
+                <th colspan="2">Nimi</th>
             </tr>
-            <tr>
-                <td>Asko Seppälä</td>
-                <td>0058</td>
-                <td><a href="potilaan_tiedot.html" class="btn btn-default">Avaa potilaan tiedot</a></td>
-            </tr>
+            <c:forEach var="asiakas" items="${asiakkaat}">
+                <tr>
+                    <td><c:out value="${asiakas.nimi}" /></td>
+                    <td>
+                        <form>
+                            <input class="hidden" name="asiakasId" value="${asiakas.id}" />
+                            <input class="btn btn-default" type="submit" name="potilaanTiedot" value="Avaa potilaan tiedot" />
+                        </form>
+                    </td>
+                </tr>
+            </c:forEach>
         </table>
     </div>
 </t:pohja>

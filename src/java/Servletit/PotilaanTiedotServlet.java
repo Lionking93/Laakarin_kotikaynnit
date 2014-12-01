@@ -1,10 +1,9 @@
 package Servletit;
 
-import Mallit.VarattavaAika;
+import Mallit.Asiakas;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.naming.NamingException;
@@ -12,12 +11,13 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  *
  * @author leo
  */
-public class LaakariServlet extends EmoServlet {
+public class PotilaanTiedotServlet extends EmoServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -32,30 +32,18 @@ public class LaakariServlet extends EmoServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        
-        try {
-            List<String> paivat = VarattavaAika.haeViikonPaivat();
-
-            request.setAttribute("paivat", paivat);
-        } catch (NamingException ex) {
-            Logger.getLogger(LaakariServlet.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SQLException ex) {
-            Logger.getLogger(LaakariServlet.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        if (request.getParameter("kirjauduUlos") != null) {
-            kirjauduUlos(request, response);
-        } else if (onkoKirjautunut(request, response)) {
-            String kayttajanNimi = getKayttaja().getNimi();
-            request.setAttribute("kayttajanNimi", kayttajanNimi);
-            if (request.getParameter("ekaTab") != null) {
-                naytaSivu(request, response, "web/tyotehtavat.jsp");
-            } else if (request.getParameter("tokaTab") != null) {
-                naytaSivu(request, response, "laakarinviikkoaikataulu");
-            } else if (request.getParameter("kolmasTab") != null) {
-                naytaSivu(request, response, "web/potilaat.jsp");
+        if (onkoKirjautunut(request, response)) {
+            try {
+                asetaAsiakkaanTiedot(request);
+            } catch (NamingException ex) {
+                Logger.getLogger(PotilaanTiedotServlet.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (SQLException ex) {
+                Logger.getLogger(PotilaanTiedotServlet.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            if (palaaEtusivulleNapinPainallus(request)) {
+                response.sendRedirect("potilaat");
             } else {
-                naytaSivu(request, response, "web/tyotehtavat.jsp");
+                naytaSivu(request, response, "web/potilaanTiedot.jsp");
             }
         }
     }
@@ -99,4 +87,22 @@ public class LaakariServlet extends EmoServlet {
         return "Short description";
     }// </editor-fold>
 
+    public void asetaAsiakkaanTiedot(HttpServletRequest request) throws NamingException, SQLException {
+        Asiakas a = haeAsiakkaanTiedot(request);
+        request.setAttribute("asiakkaanNimi", a.getNimi());
+        request.setAttribute("asiakkaanHetu", a.getHenkilotunnus());
+        request.setAttribute("asiakkaanOsoite", a.getOsoite());
+    }
+
+    public Asiakas haeAsiakkaanTiedot(HttpServletRequest request) throws NamingException, SQLException {
+        HttpSession session = request.getSession();
+        String asiakasIdTeksti = (String) session.getAttribute("asiakasId");
+        int asiakasId = Integer.parseInt(asiakasIdTeksti);
+        Asiakas a = Asiakas.haeAsiakasIdlla(asiakasId);
+        return a;
+    }
+
+    public boolean palaaEtusivulleNapinPainallus(HttpServletRequest request) {
+        return request.getParameter("etusivulle") != null;
+    }
 }

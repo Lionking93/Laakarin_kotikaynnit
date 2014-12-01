@@ -1,5 +1,6 @@
 package Servletit;
 
+import Mallit.Kayttaja;
 import Mallit.VarattavaAika;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -12,12 +13,13 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  *
  * @author leo
  */
-public class LaakariServlet extends EmoServlet {
+public class OmatVarauksetServlet extends EmoServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -32,31 +34,28 @@ public class LaakariServlet extends EmoServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        
-        try {
-            List<String> paivat = VarattavaAika.haeViikonPaivat();
-
-            request.setAttribute("paivat", paivat);
-        } catch (NamingException ex) {
-            Logger.getLogger(LaakariServlet.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SQLException ex) {
-            Logger.getLogger(LaakariServlet.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        if (request.getParameter("kirjauduUlos") != null) {
+        if (kirjaudutaankoUlos(request)) {
             kirjauduUlos(request, response);
         } else if (onkoKirjautunut(request, response)) {
-            String kayttajanNimi = getKayttaja().getNimi();
-            request.setAttribute("kayttajanNimi", kayttajanNimi);
-            if (request.getParameter("ekaTab") != null) {
-                naytaSivu(request, response, "web/tyotehtavat.jsp");
-            } else if (request.getParameter("tokaTab") != null) {
-                naytaSivu(request, response, "laakarinviikkoaikataulu");
-            } else if (request.getParameter("kolmasTab") != null) {
-                naytaSivu(request, response, "web/potilaat.jsp");
-            } else {
-                naytaSivu(request, response, "web/tyotehtavat.jsp");
+            try {
+                if (VarattavaAika.haeAjatAsiakasIdlla(getKayttaja().getId()).isEmpty()) {
+                    request.setAttribute("varauksenTila", "Sinulla ei ole ajanvarauksia.");
+                } else {
+                    if (ajanPerumisNapinPainallus(request)) {
+                        Kayttaja kayttaja = getKayttaja();
+                        int id = haePeruttavanAjanId(request);
+                        VarattavaAika.peruAika(kayttaja, id);
+                        request.setAttribute("varauksenTila", "Varaus peruttu onnistuneesti.");
+                    }
+                    List<VarattavaAika> ajat = VarattavaAika.haeAjatAsiakasIdlla(getKayttaja().getId());
+                    haeVaraustieto(request);
+                    request.setAttribute("varaukset", ajat);
+                }
+            } catch (NamingException e) {
+
+            } catch (SQLException e) {
             }
+            avaaSivunakyma(request, response,"omatvaraukset", "viikkoaikataulu", "hoito-ohjeet", "web/omatVaraukset.jsp");
         }
     }
 
@@ -98,5 +97,33 @@ public class LaakariServlet extends EmoServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
+
+    public int haeAjanvarausId(HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        int ajanvarausId;
+        ajanvarausId = (Integer) session.getAttribute("ajanvarausId");
+        return ajanvarausId;
+    }
+
+    public int haePeruttavanAjanId(HttpServletRequest request) {
+        int peruttavaAika = Integer.parseInt(request.getParameter("peruaika"));
+        return peruttavaAika;
+    }
+
+    public void haeVaraustieto(HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        String varaustieto;
+        if (session.getAttribute("varaustieto") != null) {
+            varaustieto = session.getAttribute("varaustieto").toString();
+            if (varaustieto != null) {
+                session.removeAttribute("varaustieto");
+                request.setAttribute("varauksenTila", varaustieto);
+            }
+        }
+    }
+
+    public boolean ajanPerumisNapinPainallus(HttpServletRequest request) {
+        return request.getParameter("peruaika") != null;
+    }
 
 }

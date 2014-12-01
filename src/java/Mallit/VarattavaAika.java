@@ -19,15 +19,15 @@ public class VarattavaAika {
     private int id;
     private String viikonpaiva;
     private String aika;
-    private int asiakasId;
+    private Asiakas asiakas;
     private String laakari;
     private boolean onkoVarattu;
 
-    public VarattavaAika(int id, String viikonpaiva, String aika, int asiakasId, String laakari, boolean onkoVarattu) {
+    public VarattavaAika(int id, String viikonpaiva, String aika, Asiakas asiakas, String laakari, boolean onkoVarattu) {
         this.id = id;
         this.viikonpaiva = viikonpaiva;
         this.aika = aika;
-        this.asiakasId = asiakasId;
+        this.asiakas = asiakas;
         this.laakari = laakari;
         this.onkoVarattu = onkoVarattu;
     }
@@ -37,7 +37,6 @@ public class VarattavaAika {
         this.viikonpaiva = muotoilePaivamaara(rs.getDate("viikonpaiva"));
         this.aika = rs.getString("aika");
         this.laakari = rs.getString("nimi");
-        this.asiakasId = rs.getInt("asiakas_id");
         this.onkoVarattu = rs.getBoolean("onko_varattu");
     }
     
@@ -55,8 +54,8 @@ public class VarattavaAika {
         return this.aika;
     }
     
-    public int getAsiakasId() {
-        return this.asiakasId;
+    public Asiakas getAsiakas() {
+        return this.asiakas;
     }
     
     public String getLaakari() {
@@ -79,8 +78,8 @@ public class VarattavaAika {
         this.aika = uusiAika;
     }
     
-    public void setAsiakasId(int uusiAsiakasId) {
-        this.asiakasId = uusiAsiakasId;
+    public void setAsiakas(Asiakas uusiAsiakas) {
+        this.asiakas = uusiAsiakas;
     }
     
     public void setLaakari(String uusiLaakari) {
@@ -100,14 +99,49 @@ public class VarattavaAika {
         
         VarattavaAika aika = null;
         if (rs.next()) {
-            aika = new VarattavaAika();
-            aika.setId(rs.getInt("id"));
-            aika.setAika(rs.getString("aika"));
-            aika.setViikonpaiva(muotoilePaivamaara(rs.getDate("viikonpaiva")));
-            aika.setLaakari(rs.getString("nimi"));
+            aika = new VarattavaAika(rs);
         }
         suljeResurssit(rs, kysely, yhteys);
         return aika;
+    }
+    
+    public static List<VarattavaAika> haeAjatLaakariIdlla(int laakariId) throws NamingException, SQLException {
+        Connection yhteys = luoYhteys();
+        String sql = "SELECT Varattava_aika.id as varattava_aikaid, Asiakas.id as asiakasid, Varattava_aika.viikonpaiva, Varattava_aika.aika, Varattava_aika.onko_varattu FROM Laakari, Varattava_aika, Asiakas WHERE Asiakas.id = Varattava_aika.asiakas_id AND Varattava_aika.laakari_id = Laakari.id AND Varattava_aika.laakari_id = ?";
+        PreparedStatement kysely = yhteys.prepareStatement(sql);
+        kysely.setInt(1, laakariId);
+        ResultSet rs = kysely.executeQuery();
+        
+        List<VarattavaAika> ajat = new ArrayList<VarattavaAika>();
+        while (rs.next()) {
+            VarattavaAika aika = new VarattavaAika();
+            aika.setId(rs.getInt("varattava_aikaid"));
+            Asiakas a = Asiakas.haeAsiakasIdlla(rs.getInt("asiakasid"));
+            aika.setAsiakas(a);
+            aika.setViikonpaiva(muotoilePaivamaara(rs.getDate("viikonpaiva")));
+            aika.setAika(rs.getString("aika"));
+            aika.setOnkoVarattu(rs.getBoolean("onko_varattu"));
+            ajat.add(aika);
+        }
+        suljeResurssit(rs, kysely, yhteys);
+        return ajat;
+    }
+    
+    public static List<VarattavaAika> haeAjatAsiakasIdlla(int asiakasId) throws NamingException, SQLException {
+        Connection yhteys = luoYhteys();
+        String sql = "SELECT Varattava_aika.id, Laakari.nimi, Varattava_aika.viikonpaiva, Varattava_aika.aika, Varattava_aika.onko_varattu FROM Laakari, Varattava_aika, Asiakas WHERE Asiakas.id = Varattava_aika.asiakas_id AND Varattava_aika.laakari_id = Laakari.id AND Varattava_aika.asiakas_id = ?";
+        PreparedStatement kysely = yhteys.prepareStatement(sql);
+        kysely.setInt(1, asiakasId);
+        ResultSet rs = kysely.executeQuery();
+        
+        List<VarattavaAika> ajat = new ArrayList<VarattavaAika>();
+        while (rs.next()) {
+            VarattavaAika aika = new VarattavaAika(rs);
+                       
+            ajat.add(aika);
+        }
+        suljeResurssit(rs, kysely, yhteys);
+        return ajat;
     }
     
     public static List<VarattavaAika> haeVarattavatLaakarit(int moneskoRivi) throws SQLException, NamingException {
@@ -115,7 +149,7 @@ public class VarattavaAika {
         int montako = 5;
         int rivi = moneskoRivi;
         
-        String sql = "SELECT varattava_aika.id, varattava_aika.viikonpaiva, varattava_aika.aika, Laakari.nimi, varattava_aika.onko_varattu FROM Laakari, Varattava_aika WHERE laakari.id = varattava_aika.laakari_id LIMIT ? OFFSET ?";
+        String sql = "SELECT varattava_aika.id, varattava_aika.viikonpaiva, varattava_aika.aika, Laakari.nimi, varattava_aika.onko_varattu FROM Laakari, Varattava_aika WHERE laakari.id = varattava_aika.laakari_id ORDER BY id asc LIMIT ? OFFSET ?";
         PreparedStatement kysely = yhteys.prepareStatement(sql);
         kysely.setInt(1, montako);
         kysely.setInt(2, (rivi-1)*montako);
@@ -123,12 +157,7 @@ public class VarattavaAika {
         
         List<VarattavaAika> varattavatLaakarit = new ArrayList<VarattavaAika>();
         while (rs.next()) {
-            VarattavaAika v = new VarattavaAika();
-            v.setId(rs.getInt("id"));
-            v.setViikonpaiva(muotoilePaivamaara(rs.getDate("viikonpaiva")));
-            v.setAika(rs.getString("aika"));
-            v.setLaakari(rs.getString("nimi"));
-            v.setOnkoVarattu(rs.getBoolean("onko_varattu"));
+            VarattavaAika v = new VarattavaAika(rs);
             varattavatLaakarit.add(v);
         }
         suljeResurssit(rs, kysely, yhteys);
@@ -153,6 +182,34 @@ public class VarattavaAika {
         suljeResurssit(rs, kysely, yhteys);
         
         return viikonpaivat;
+    }
+    
+    public static void lisaaAsiakasId(Kayttaja kayttaja, int id) throws NamingException, SQLException {
+        Connection yhteys = luoYhteys();
+        int asiakasId = kayttaja.getId();
+        String sql = "UPDATE varattava_aika SET asiakas_id = ?, onko_varattu = 'true' WHERE id = ?";
+        PreparedStatement kysely = yhteys.prepareStatement(sql);
+        kysely.setInt(1, asiakasId);
+        kysely.setInt(2, id);
+        
+        kysely.executeUpdate();
+        
+        try { kysely.close(); } catch (Exception e) {}
+        try { yhteys.close(); } catch (Exception e) {}
+    }
+    
+    public static void peruAika(Kayttaja kayttaja, int id) throws NamingException, SQLException {
+        Connection yhteys = luoYhteys();
+        int asiakasId = kayttaja.getId();
+        String sql = "UPDATE varattava_aika SET asiakas_id = NULL, onko_varattu = 'false' WHERE asiakas_id = ? AND id = ?";
+        PreparedStatement kysely = yhteys.prepareStatement(sql);
+        kysely.setInt(1, asiakasId);
+        kysely.setInt(2, id);
+        
+        kysely.executeUpdate();
+        
+        try { kysely.close(); } catch (Exception e) {}
+        try { yhteys.close(); } catch (Exception e) {}
     }
     
     public static String muotoilePaivamaara(Date date) {
@@ -185,5 +242,7 @@ public class VarattavaAika {
         Connection yhteys = tietokanta.getYhteys();
         return yhteys;
     }
+    
+    
     
 }

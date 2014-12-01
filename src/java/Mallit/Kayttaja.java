@@ -37,7 +37,7 @@ public class Kayttaja {
         this.tunnus = rs.getString("tunnus");
         this.salasana = rs.getString("salasana");
         /*this.syntymaaika = rs.getDate("syntymaaika").toString();
-         this.osoite = rs.getString("osoite");*/
+        this.osoite = rs.getString("osoite");*/
     }
 
     public Kayttaja(int id, String nimi, String tunnus, String salasana) {
@@ -110,22 +110,15 @@ public class Kayttaja {
         ResultSet rs = kysely.executeQuery();
         Kayttaja kayttaja = null;
         if (rs.next()) {
+            /*if (!onkoAsiakasAttribuutteja(rs)) {
+                kayttaja = new Kayttaja(rs);
+            } else {
+                kayttaja = new Kayttaja(rs);
+                asetaAsiakasAttribuutit(rs, kayttaja);
+            }*/
             kayttaja = new Kayttaja(rs);
-            /*if (onkoAsiakasAttribuutteja(rs)) {
-             asetaAsiakasAttribuutit(rs, kayttaja);
-             }*/
         }
-
-        try {
-            rs.close();
-        } catch (Exception e) {
-        }
-
-        try {
-            yhteys.close();
-        } catch (Exception e) {
-        }
-
+        try { rs.close(); } catch (Exception e) {}
         return kayttaja;
     }
 

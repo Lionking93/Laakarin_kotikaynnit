@@ -38,19 +38,42 @@ public class Asiakas extends Kayttaja {
         PreparedStatement kysely = yhteys.prepareStatement(sql);
         kysely.setString(1, username);
         kysely.setString(2, password);
-        
-        Kayttaja kirjautunut = haeKayttaja(kysely, yhteys);
+        ResultSet rs = kysely.executeQuery();
+       
+        Kayttaja kirjautunut = null;
+        if (rs.next()) {
+            kirjautunut = new Kayttaja(rs);
+        }
 
         try {
             kysely.close();
         } catch (Exception e) {
         }
+        try { rs.close(); } catch (Exception e) {}
+        try { yhteys.close(); } catch (Exception e) {}
         return kirjautunut;
+    }
+    
+    public static Asiakas haeAsiakasIdlla(int id) throws NamingException, SQLException {
+        Yhteys tietokanta = new Yhteys();
+        Connection yhteys = tietokanta.getYhteys();
+        String sql = "SELECT * FROM Asiakas WHERE id = ?";
+        PreparedStatement kysely = yhteys.prepareStatement(sql);
+        kysely.setInt(1, id);
+        ResultSet rs = kysely.executeQuery();
+        Asiakas a = null;
+        if (rs.next()) {
+            a = new Asiakas(rs);
+        }
+        try { rs.close(); } catch (Exception e) {}
+        try { kysely.close(); } catch (Exception e) {}
+        try { yhteys.close(); } catch (Exception e) {}
+        return a;
     }
 
     /*Tallentaa kaikki tietokannan asiakas-käyttäjät listaan.*/
     public static List<Asiakas> getAsiakkaat() throws SQLException, NamingException {
-        String sql = "SELECT id, nimi, tunnus, salasana, syntymaaika, henkilotunnus, osoite FROM Asiakas";
+        String sql = "SELECT * FROM Asiakas";
         Yhteys Tietokanta = new Yhteys();
         Connection yhteys = Tietokanta.getYhteys();
         PreparedStatement kysely = yhteys.prepareStatement(sql);
@@ -59,13 +82,7 @@ public class Asiakas extends Kayttaja {
         List<Asiakas> asiakkaat = new ArrayList<Asiakas>();
         while (rs.next()) {
 
-            Asiakas a = new Asiakas();
-            a.setId(rs.getInt("id"));
-            a.setNimi(rs.getString("nimi"));
-            a.setSalasana(rs.getString("salasana"));
-            a.setSyntymaaika(rs.getDate("syntymaaika").toString());
-            a.setHenkilotunnus(rs.getString("henkilotunnus"));
-            a.setOsoite(rs.getString("osoite"));
+            Asiakas a = new Asiakas(rs);
 
             asiakkaat.add(a);
         }

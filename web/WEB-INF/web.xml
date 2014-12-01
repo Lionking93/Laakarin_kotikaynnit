@@ -13,10 +13,6 @@
         <servlet-class>Tietokanta.NewServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>AsiakasServlet</servlet-name>
-        <servlet-class>Servletit.AsiakasServlet</servlet-class>
-    </servlet>
-    <servlet>
         <servlet-name>EmoServlet</servlet-name>
         <servlet-class>Servletit.EmoServlet</servlet-class>
     </servlet>
@@ -29,8 +25,36 @@
         <servlet-class>Servletit.LaakariServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>VarattavaAikaServlet</servlet-name>
+        <servlet-name>ViikkoaikatauluServlet</servlet-name>
         <servlet-class>Servletit.ViikkoaikatauluServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>OmatVarauksetServlet</servlet-name>
+        <servlet-class>Servletit.OmatVarauksetServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>HoitoOhjeetServlet</servlet-name>
+        <servlet-class>Servletit.HoitoOhjeetServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>TyotehtavatServlet</servlet-name>
+        <servlet-class>Servletit.TyotehtavatServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>OirekuvausServlet</servlet-name>
+        <servlet-class>Servletit.OirekuvausServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>PotilaatServlet</servlet-name>
+        <servlet-class>Servletit.PotilaatServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>PotilaanTiedotServlet</servlet-name>
+        <servlet-class>Servletit.PotilaanTiedotServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>PotilastiedonKasittelyServlet</servlet-name>
+        <servlet-class>Servletit.PotilastiedonKasittelyServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>SQLTesti2</servlet-name>
@@ -45,10 +69,6 @@
         <url-pattern>/NewServlet</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>AsiakasServlet</servlet-name>
-        <url-pattern>/asiakkaanetusivu</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
         <servlet-name>EmoServlet</servlet-name>
         <url-pattern>/EmoServlet</url-pattern>
     </servlet-mapping>
@@ -61,8 +81,36 @@
         <url-pattern>/laakarinetusivu</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>VarattavaAikaServlet</servlet-name>
+        <servlet-name>ViikkoaikatauluServlet</servlet-name>
         <url-pattern>/viikkoaikataulu</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>OmatVarauksetServlet</servlet-name>
+        <url-pattern>/omatvaraukset</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>HoitoOhjeetServlet</servlet-name>
+        <url-pattern>/hoito-ohjeet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>TyotehtavatServlet</servlet-name>
+        <url-pattern>/tyotehtavat</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>OirekuvausServlet</servlet-name>
+        <url-pattern>/oirekuvaus</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>PotilaatServlet</servlet-name>
+        <url-pattern>/potilaat</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>PotilaanTiedotServlet</servlet-name>
+        <url-pattern>/potilaantiedot</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>PotilastiedonKasittelyServlet</servlet-name>
+        <url-pattern>/potilastiedonkasittely</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

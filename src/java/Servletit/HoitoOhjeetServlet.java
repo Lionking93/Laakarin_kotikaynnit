@@ -1,13 +1,7 @@
 package Servletit;
 
-import Mallit.VarattavaAika;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.naming.NamingException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -17,7 +11,7 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author leo
  */
-public class LaakariServlet extends EmoServlet {
+public class HoitoOhjeetServlet extends EmoServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -32,31 +26,10 @@ public class LaakariServlet extends EmoServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        
-        try {
-            List<String> paivat = VarattavaAika.haeViikonPaivat();
-
-            request.setAttribute("paivat", paivat);
-        } catch (NamingException ex) {
-            Logger.getLogger(LaakariServlet.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SQLException ex) {
-            Logger.getLogger(LaakariServlet.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        if (request.getParameter("kirjauduUlos") != null) {
+        if (kirjaudutaankoUlos(request)) {
             kirjauduUlos(request, response);
         } else if (onkoKirjautunut(request, response)) {
-            String kayttajanNimi = getKayttaja().getNimi();
-            request.setAttribute("kayttajanNimi", kayttajanNimi);
-            if (request.getParameter("ekaTab") != null) {
-                naytaSivu(request, response, "web/tyotehtavat.jsp");
-            } else if (request.getParameter("tokaTab") != null) {
-                naytaSivu(request, response, "laakarinviikkoaikataulu");
-            } else if (request.getParameter("kolmasTab") != null) {
-                naytaSivu(request, response, "web/potilaat.jsp");
-            } else {
-                naytaSivu(request, response, "web/tyotehtavat.jsp");
-            }
+            avaaSivunakyma(request, response, "omatvaraukset", "viikkoaikataulu", "hoito-ohjeet", "web/hoitoOhjeet.jsp");
         }
     }
 

@@ -7,6 +7,13 @@
     right: 0.5em
 }
 
+.linkkiteksti {
+    border: 0;
+    padding: 0;
+    background: none;
+    color: black;
+}
+
 .false {
     background-color: #33D633;
 }

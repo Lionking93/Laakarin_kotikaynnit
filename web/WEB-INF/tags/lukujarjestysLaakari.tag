@@ -26,7 +26,7 @@
             <td>08:00-08:45</td>
             <c:forEach var="aika" items="${ajat1}">
                 <td>${aika.laakari}</td>
-                    </c:forEach>
+            </c:forEach>
         </tr>
         <tr><!--<input class="btn btn-link" type="submit" name="ajanvaraus" value="${aika.id}" />!-->
             <td>09:00-09:45</td>

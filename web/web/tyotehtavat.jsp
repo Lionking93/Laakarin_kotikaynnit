@@ -6,13 +6,27 @@
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="t" tagdir="/WEB-INF/tags"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
-<t:pohja kenenTili="Lääkäri" aktiivinenEkaTab="active" ekaTab="Työtehtävät" tokaTab="Viikkoaikataulu" kolmasTab="Potilaat">
+<t:pohja kenenTili="Lääkäri" aktiivinenEkaTab="active" ekaTab="Työtehtävät" tokaTab="eiole" kolmasTab="Potilaat">
     <div class="tab-pane active">
-        <t:lukujarjestys infoteksti="Alla on merkitty suoritetut työtehtävät vihreällä ja kuittaamattomat punaisella. 
-                                Suoritettuasi työtehtävän, kuittaa suoritus painamalla kyseistä työtehtävää vastaavaa 
-                                viikkoaikataulun saraketta.">
-            
-        </t:lukujarjestys>
+        <table class="table table-striped">
+            <tr>
+                <th>Potilas</th>
+                <th>Varattu aika</th>
+                <th colspan="1">Oireiden kuvaus</th>
+            </tr>
+            <c:forEach var="tyo" items="${tyot}" varStatus="monesko">
+                <tr>
+                    <td><c:out value="${tyo.asiakas.nimi}" /></td>
+                    <td><c:out value="${tyo.viikonpaiva}, ${tyo.aika}" /></td>
+                    <td><c:out value="${oireet[monesko.index].kuvaus}" /></td>
+                    <td><form><button type="submit" name="kuittaus" value="${tyo.asiakas.id}">Kuittaa suoritetuksi</button></form></td>
+                </tr>
+            </c:forEach>
+        </table>
+        <c:if test="${tyotehtavienTila != null}">
+            <div class="col-xs-3 alert alert-info"><c:out value="${tyotehtavienTila}" /></div>
+        </c:if>
     </div>
 </t:pohja>

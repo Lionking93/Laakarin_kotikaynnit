@@ -1,24 +1,23 @@
 package Servletit;
 
-import Mallit.Laakari;
+import Mallit.Kayttaja;
 import Mallit.VarattavaAika;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.naming.NamingException;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  *
  * @author leo
  */
-public class ViikkoaikatauluServlet extends AsiakasServlet {
+public class ViikkoaikatauluServlet extends EmoServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -39,15 +38,20 @@ public class ViikkoaikatauluServlet extends AsiakasServlet {
         } catch (Exception e) {
             naytaVirheSivu("Tiedon hakeminen tietokannasta epäonnistui.", request, response);
         }
+
         if (kirjaudutaankoUlos(request)) {
             kirjauduUlos(request, response);
         } else if (onkoKirjautunut(request, response)) {
-            avaaSivunakyma(request, response, "web/viikkoaikataulu.jsp");
+            if (varaaAikaNapinPainallus(request, response)) {
+                lahetaVaraustiedotOirekuvausServletille(request);
+                response.sendRedirect("oirekuvaus");
+            } else {
+                avaaSivunakyma(request, response, "omatvaraukset", "viikkoaikataulu", "hoito-ohjeet", "web/viikkoaikataulu.jsp");
+            }
         }
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-
     /**
      * Handles the HTTP <code>GET</code> method.
      *
@@ -86,16 +90,31 @@ public class ViikkoaikatauluServlet extends AsiakasServlet {
         return "Short description";
     }// </editor-fold>
 
-    public void asetaLaakaritViikkoaikatauluun(HttpServletRequest request) throws SQLException, NamingException {
+    protected void asetaLaakaritViikkoaikatauluun(HttpServletRequest request) throws SQLException, NamingException {
         for (int i = 1; i < 9; i++) {
             List<VarattavaAika> varattavatAjat = VarattavaAika.haeVarattavatLaakarit(i);
             request.setAttribute("ajat" + i, varattavatAjat);
         }
     }
 
-    public void asetaPaivatViikkoaikatauluun(HttpServletRequest request) throws NamingException, SQLException {
+    protected void asetaPaivatViikkoaikatauluun(HttpServletRequest request) throws NamingException, SQLException {
         List<String> paivat = VarattavaAika.haeViikonPaivat();
         request.setAttribute("paivat", paivat);
     }
 
+    public boolean varaaAikaNapinPainallus(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        return request.getParameter("ajanvaraus") != null;
+    }
+
+    public void lahetaVaraustiedotOirekuvausServletille(HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        String laakarinNimi = request.getParameter("laakarinNimi");
+        String laakarinAika = request.getParameter("laakarinAika");
+        String ajanId = request.getParameter("ajanId");
+        String ajanPvm = request.getParameter("ajanPvm");
+        session.setAttribute("laakarinNimi", laakarinNimi);
+        session.setAttribute("laakarinAika", laakarinAika);
+        session.setAttribute("ajanId", ajanId);
+        session.setAttribute("ajanPvm", ajanPvm);
+    }
 }

@@ -38,11 +38,17 @@ public class Laakari extends Kayttaja {
         kysely.setString(1, username);
         kysely.setString(2, password);
         
-        Kayttaja kirjautunut = haeKayttaja(kysely, yhteys);
+        ResultSet rs = kysely.executeQuery();
+        Kayttaja kirjautunut = null;
+        if (rs.next()) {
+            kirjautunut = new Kayttaja(rs);
+        }
         
+        try { rs.close(); } catch (Exception e) {}
         try {
             kysely.close();
         } catch (Exception e) {}
+        try { yhteys.close(); } catch (Exception e) {}
         
         return kirjautunut;
     }
@@ -59,7 +65,8 @@ public class Laakari extends Kayttaja {
         try {
             kysely.close();
         } catch (Exception e) {}
-        
+        try { yhteys.close(); } catch (Exception e) {}
         return laakari;
     }
+   
 }

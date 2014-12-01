@@ -1,9 +1,12 @@
 package Servletit;
 
+import Mallit.Asiakas;
+import Mallit.Oirekuvaus;
 import Mallit.VarattavaAika;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -12,12 +15,13 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  *
  * @author leo
  */
-public class LaakariServlet extends EmoServlet {
+public class TyotehtavatServlet extends EmoServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -32,30 +36,30 @@ public class LaakariServlet extends EmoServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        
-        try {
-            List<String> paivat = VarattavaAika.haeViikonPaivat();
-
-            request.setAttribute("paivat", paivat);
-        } catch (NamingException ex) {
-            Logger.getLogger(LaakariServlet.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SQLException ex) {
-            Logger.getLogger(LaakariServlet.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        if (request.getParameter("kirjauduUlos") != null) {
+        if (kirjaudutaankoUlos(request)) {
             kirjauduUlos(request, response);
         } else if (onkoKirjautunut(request, response)) {
-            String kayttajanNimi = getKayttaja().getNimi();
-            request.setAttribute("kayttajanNimi", kayttajanNimi);
-            if (request.getParameter("ekaTab") != null) {
-                naytaSivu(request, response, "web/tyotehtavat.jsp");
-            } else if (request.getParameter("tokaTab") != null) {
-                naytaSivu(request, response, "laakarinviikkoaikataulu");
-            } else if (request.getParameter("kolmasTab") != null) {
-                naytaSivu(request, response, "web/potilaat.jsp");
+            try {
+                if (VarattavaAika.haeAjatLaakariIdlla(getKayttaja().getId()).isEmpty()) {
+                    request.setAttribute("tyotehtavienTila", "Sinulla ei ole tyotehtäviä.");
+                } else {
+                    List<VarattavaAika> tyot = VarattavaAika.haeAjatLaakariIdlla(getKayttaja().getId());
+                    request.setAttribute("tyot", tyot);
+                    List<Oirekuvaus> l = new ArrayList<Oirekuvaus>();
+                    for (VarattavaAika tyot1 : tyot) {
+                        Oirekuvaus oire = Oirekuvaus.haeOirekuvausVarattavaAikaIdlla(tyot1.getId());
+                        l.add(oire);
+                    }
+                    request.setAttribute("oireet", l);
+                }
+            } catch (NamingException e) {
+            } catch (SQLException e) {
+            }
+            if (kuittaaSuoritetuksiNapinPainallus(request)) {
+                lahetaAsiakkaanTiedotPotilastiedonKasittelyServletille(request);
+                response.sendRedirect("potilastiedonkasittely");
             } else {
-                naytaSivu(request, response, "web/tyotehtavat.jsp");
+                avaaSivunakyma(request, response, "tyotehtavat", "laakarinviikkoaikataulu", "potilaat", "web/tyotehtavat.jsp");
             }
         }
     }
@@ -99,4 +103,13 @@ public class LaakariServlet extends EmoServlet {
         return "Short description";
     }// </editor-fold>
 
+    public boolean kuittaaSuoritetuksiNapinPainallus(HttpServletRequest request) {
+        return request.getParameter("kuittaus") != null;
+    }
+
+    public void lahetaAsiakkaanTiedotPotilastiedonKasittelyServletille(HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        String asiakasId = request.getParameter("kuittaus");
+        session.setAttribute("asiakasId", asiakasId);
+    }
 }
