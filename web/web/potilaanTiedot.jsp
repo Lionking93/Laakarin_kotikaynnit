@@ -50,41 +50,47 @@
                             <tr>
                                 <td><c:out value="${lisaysajankohdatOirekuvaus[paikka.index]}" /></td>
                                 <td><c:out value="${oire.lisattavaTeksti}" /></td>
+                                <td>
+                                    <c:forEach var="hoitoOhje" items="${hoito_ohjeet}">
+                                        <c:if test="${hoitoOhje.varattavaAikaId == oire.varattavaAikaId}">
+                                            <c:out value="${hoitoOhje.lisattavaTeksti}" />
+                                        </c:if>
+                                    </c:forEach>
+                                </td>
                                 <td></td>
-                                <td></td>
-                            </tr>
+                            </tr
                         </c:forEach>
-                        <!--<tr>
-                            <td>15.11.2014, 15:02</td>
-                            <td>Pää kipee</td>
-                            <td>2*400 mg Buranaa</td>
-                            <td><a href="luo_potilastieto.html" class="btn btn-default">Muokkaa hoito-ohjetta</a></td>
-                        </tr>
+                            <!--<tr>
+                        <td>15.11.2014, 15:02</td>
+                        <td>Pää kipee</td>
+                        <td>2*400 mg Buranaa</td>
+                        <td><a href="luo_potilastieto.html" class="btn btn-default">Muokkaa hoito-ohjetta</a></td>
+                    </tr>
+                    <tr>
+                        <td>20.11.2014, 12:18</td>
+                        <td>Borrelioosi</td>
+                        <td>Doksisykliini-kuuri</td>
+                        <td><a href="luo_potilastieto.html" class="btn btn-default">Muokkaa hoito-ohjetta</a></td>
+                    </tr>!-->
+                </table>
+            </div>
+            <div id="potilasraportit" class="tab-pane">
+                <table class="table table-bordered">
+                    <tr>
+                        <th>Lisäysajankohta</th>
+                        <th colspan="2">Raportti</th>
+                    </tr>
+                    <c:forEach var="raportti" items="${potilasraportit}" varStatus="monesko">
                         <tr>
-                            <td>20.11.2014, 12:18</td>
-                            <td>Borrelioosi</td>
-                            <td>Doksisykliini-kuuri</td>
-                            <td><a href="luo_potilastieto.html" class="btn btn-default">Muokkaa hoito-ohjetta</a></td>
-                        </tr>!-->
-                    </table>
-                </div>
-                <div id="potilasraportit" class="tab-pane">
-                    <table class="table table-bordered">
-                        <tr>
-                            <th>Lisäysajankohta</th>
-                            <th colspan="2">Raportti</th>
+                            <td><c:out value="${lisaysajankohdatPotilasraportti[monesko.index]}" /></td>
+                            <td><c:out value="${raportti.lisattavaTeksti}" /></td>
+                            <td><a href="luo_potilastieto.html" class="btn btn-default">Muokkaa potilasraporttia</a></td>
                         </tr>
-                        <c:forEach var="raportti" items="${potilasraportit}" varStatus="monesko">
-                            <tr>
-                                <td><c:out value="${lisaysajankohdatPotilasraportti[monesko.index]}" /></td>
-                                <td><c:out value="${raportti.lisattavaTeksti}" /></td>
-                                <td><a href="luo_potilastieto.html" class="btn btn-default">Muokkaa potilasraporttia</a></td>
-                            </tr>
-                        </c:forEach>
-                    </table>
-                </div>
+                    </c:forEach>
+                </table>
             </div>
         </div>
-        <script src="js/bootstrap.js"></script>
-    </body>
+    </div>
+    <script src="js/bootstrap.js"></script>
+</body>
 </html>

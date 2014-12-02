@@ -42,19 +42,19 @@ public class PotilaanTiedotServlet extends EmoServlet {
         response.setContentType("text/html;charset=UTF-8");
         if (onkoKirjautunut(request, response)) {
             try {
-                asetaAsiakkaanTiedot(request);
-                lisaaPotilasraportit(request, response);
-                lisaaHoitoOhjeet(request, response);
-                lisaaOirekuvaukset(request, response);
+                if (palaaEtusivulleNapinPainallus(request)) {
+                    response.sendRedirect("potilaat");
+                } else {
+                    asetaAsiakkaanTiedot(request);
+                    lisaaPotilasraportit(request, response);
+                    lisaaHoitoOhjeet(request, response);
+                    lisaaOirekuvaukset(request, response);
+                    naytaSivu(request, response, "web/potilaanTiedot.jsp");
+                }
             } catch (NamingException ex) {
                 Logger.getLogger(PotilaanTiedotServlet.class.getName()).log(Level.SEVERE, null, ex);
             } catch (SQLException ex) {
                 Logger.getLogger(PotilaanTiedotServlet.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            if (palaaEtusivulleNapinPainallus(request)) {
-                response.sendRedirect("potilaat");
-            } else {
-                naytaSivu(request, response, "web/potilaanTiedot.jsp");
             }
         }
     }

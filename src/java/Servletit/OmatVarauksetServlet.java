@@ -1,6 +1,7 @@
 package Servletit;
 
 import Mallit.Kayttaja;
+import Mallit.Oirekuvaus;
 import Mallit.VarattavaAika;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -45,6 +46,7 @@ public class OmatVarauksetServlet extends EmoServlet {
                         Kayttaja kayttaja = getKayttaja();
                         int id = haePeruttavanAjanId(request);
                         VarattavaAika.peruAika(kayttaja, id);
+                        Oirekuvaus.poistaOirekuvaus(id);
                         request.setAttribute("varauksenTila", "Varaus peruttu onnistuneesti.");
                     }
                     List<VarattavaAika> ajat = VarattavaAika.haeAjatAsiakasIdlla(getKayttaja().getId());

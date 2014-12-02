@@ -4,6 +4,7 @@ import Mallit.Asiakas;
 import Mallit.HoitoOhje;
 import Mallit.Potilasraportti;
 import Mallit.Potilastieto;
+import Mallit.VarattavaAika;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
@@ -120,6 +121,14 @@ public class PotilastiedonKasittelyServlet extends EmoServlet {
         Asiakas a = Asiakas.haeAsiakasIdlla(asiakasId);
         return a;
     }
+    
+    public VarattavaAika haeVarauksenTiedot(HttpServletRequest request) throws SQLException, NamingException {
+        HttpSession session = request.getSession();
+        String varausIdTeksti = (String) session.getAttribute("varausId");
+        int varausId = Integer.parseInt(varausIdTeksti);
+        VarattavaAika v = VarattavaAika.haeVarattavaAikaIdlla(varausId);
+        return v;
+    }
 
     public void asetaAsiakkaanTiedot(HttpServletRequest request) throws NamingException, SQLException {
         Asiakas a = haeAsiakkaanTiedot(request);
@@ -140,7 +149,8 @@ public class PotilastiedonKasittelyServlet extends EmoServlet {
     }
 
     public void lisaaPotilastiedonAttribuutit(HttpServletRequest request, Potilastieto p) throws SQLException, NamingException {
-        p.setId(haeAsiakkaanTiedot(request).getId());
+        p.setVarattavaAikaId(haeVarauksenTiedot(request).getId());
+        p.setAsiakasId(haeAsiakkaanTiedot(request).getId());
         p.setLisaysajankohta(luoLisaysajankohta());
         p.setLisattavaTeksti(request.getParameter("potilastieto"));
     }

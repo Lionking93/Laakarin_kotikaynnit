@@ -144,7 +144,8 @@ public class OirekuvausServlet extends EmoServlet {
 
     public Oirekuvaus luoOirekuvaus(HttpServletRequest request) throws NamingException, SQLException {
         Oirekuvaus k = new Oirekuvaus();
-        k.setId(haeAjanvarauksenId(request));
+        k.setVarattavaAikaId(haeAjanvarauksenId(request));
+        k.setAsiakasId(getKayttaja().getId());
         k.setLisaysajankohta(luoLisaysajankohta());
         k.setLisattavaTeksti(request.getParameter("oirekuvaus"));
         return k;

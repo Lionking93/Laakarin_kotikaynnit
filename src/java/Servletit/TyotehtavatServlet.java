@@ -56,7 +56,7 @@ public class TyotehtavatServlet extends EmoServlet {
             } catch (SQLException e) {
             }
             if (kuittaaSuoritetuksiNapinPainallus(request)) {
-                lahetaAsiakkaanTiedotPotilastiedonKasittelyServletille(request);
+                lahetaTyotehtavanTiedotPotilastiedonKasittelyServletille(request);
                 response.sendRedirect("potilastiedonkasittely");
             } else {
                 avaaSivunakyma(request, response, "tyotehtavat", "laakarinviikkoaikataulu", "potilaat", "web/tyotehtavat.jsp");
@@ -107,9 +107,11 @@ public class TyotehtavatServlet extends EmoServlet {
         return request.getParameter("kuittaus") != null;
     }
 
-    public void lahetaAsiakkaanTiedotPotilastiedonKasittelyServletille(HttpServletRequest request) {
+    public void lahetaTyotehtavanTiedotPotilastiedonKasittelyServletille(HttpServletRequest request) {
         HttpSession session = request.getSession();
         String asiakasId = request.getParameter("kuittaus");
+        String varauksenId = request.getParameter("varauksenId");
         session.setAttribute("asiakasId", asiakasId);
+        session.setAttribute("varausId", varauksenId);
     }
 }
