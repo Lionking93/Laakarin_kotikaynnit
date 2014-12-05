@@ -53,7 +53,7 @@ public class Oirekuvaus extends Potilastieto {
     public static List<Oirekuvaus> haeOirekuvauksetAsiakasIdlla(int id) throws NamingException, SQLException {
         Yhteys tietokanta = new Yhteys();
         Connection yhteys = tietokanta.getYhteys();
-        String sql = "SELECT Oirekuvaus.id, Oirekuvaus.oirekuvaus_varattava_aika_id, Oirekuvaus.oirekuvaus_asiakas_id, oirekuvaus.lisaysajankohta, oirekuvaus.kuvaus FROM Oirekuvaus, Asiakas WHERE Oirekuvaus.oirekuvaus_asiakas_id = Asiakas.id AND Asiakas.id = ?";
+        String sql = "SELECT Oirekuvaus.id, Oirekuvaus.oirekuvaus_varattava_aika_id, Oirekuvaus.oirekuvaus_asiakas_id, oirekuvaus.lisaysajankohta, oirekuvaus.kuvaus FROM Oirekuvaus, Asiakas WHERE Oirekuvaus.oirekuvaus_asiakas_id = Asiakas.id AND Asiakas.id = ? ORDER BY oirekuvaus_varattava_aika_id asc";
         PreparedStatement kysely = yhteys.prepareStatement(sql);
         kysely.setInt(1, id);
         ResultSet rs = kysely.executeQuery();

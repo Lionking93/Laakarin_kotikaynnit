@@ -11,7 +11,9 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.naming.NamingException;
@@ -44,11 +46,23 @@ public class PotilaanTiedotServlet extends EmoServlet {
             try {
                 if (palaaEtusivulleNapinPainallus(request)) {
                     response.sendRedirect("potilaat");
+                } else if (lisaaHoitoOhjeNapinPainallus(request)) {
+                    lahetaTyhjanHoitoOhjeenTiedotLisaaPotilasRaporttiServletille(request);
+                    response.sendRedirect("lisaahoitoohje");
+                } else if (poistaHoitoOhjeNapinPainallus(request)) {
+                    int hoitoOhjeenId = Integer.parseInt(request.getParameter("hoitoOhjeenId"));
+                    HoitoOhje.poistaHoitoOhje(hoitoOhjeenId);
+                    asetaAsiakkaanTiedot(request);
+                    lisaaPotilasraportit(request, response);
+                    lisaaOirekuvaukset(request, response);
+                    lisaaHoitoOhjeet(request, response);
+                    request.setAttribute("onnistunutPoisto", "Hoito-ohje poistettu onnistuneesti");
+                    naytaSivu(request, response, "web/potilaanTiedot.jsp");
                 } else {
                     asetaAsiakkaanTiedot(request);
                     lisaaPotilasraportit(request, response);
-                    lisaaHoitoOhjeet(request, response);
                     lisaaOirekuvaukset(request, response);
+                    lisaaHoitoOhjeet(request, response);
                     naytaSivu(request, response, "web/potilaanTiedot.jsp");
                 }
             } catch (NamingException ex) {
@@ -59,7 +73,7 @@ public class PotilaanTiedotServlet extends EmoServlet {
         }
     }
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
+// <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
      *
@@ -126,45 +140,66 @@ public class PotilaanTiedotServlet extends EmoServlet {
             request.setAttribute("lisaysajankohdatPotilasraportti", pvm);
             request.setAttribute("potilasraportit", l);
         } catch (Exception e) {
-            naytaVirheSivu("Tietokannasta haku epäonnistui", request, response);
+            naytaVirheSivu("Potilasraporttien haku tietokannasta epäonnistui", request, response);
         }
     }
 
     public void lisaaHoitoOhjeet(HttpServletRequest request, HttpServletResponse response) throws NamingException, SQLException, ServletException, IOException {
         Asiakas a = haeAsiakkaanTiedot(request);
         try {
-            List<HoitoOhje> o = HoitoOhje.haeHoitoOhjeetAsiakasIdlla(a.getId());
-            List<String> pvm = new ArrayList<String>();
-            for (HoitoOhje h : o) {
-                SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy hh:mm:ss");
-                String muokattava = format.format(h.getLisaysajankohta());
-                pvm.add(muokattava);
+            List<HoitoOhje> h = new ArrayList<HoitoOhje>();
+            List<Oirekuvaus> o = Oirekuvaus.haeOirekuvauksetAsiakasIdlla(a.getId());
+            List<Integer> i = new ArrayList<Integer>();
+            for (HoitoOhje hoo : HoitoOhje.haeHoitoOhjeetAsiakasIdlla(a.getId())) {
+                i.add(hoo.getVarattavaAikaId());
             }
-            request.setAttribute("lisaysajankohdatHoitoOhje", pvm);
-            request.setAttribute("hoito_ohjeet", o);
-        } catch (Exception r) {
-            naytaVirheSivu("Tietokannasta haku epäonnistui", request, response);
+            for (Oirekuvaus o1 : o) {
+                if (i.contains(o1.getVarattavaAikaId())) {
+                    h.add(HoitoOhje.haeHoitoOhjeVarattavaAikaIdlla(o1.getVarattavaAikaId()));
+                } else {
+                    h.add(new HoitoOhje());
+                }
+            }
+            request.setAttribute("hoitoOhjeet", h);
+        } catch (Exception e) {
+            naytaVirheSivu("Hoito-ohjeiden haku tietokannasta epäonnistui.", request, response);
         }
     }
 
     public void lisaaOirekuvaukset(HttpServletRequest request, HttpServletResponse response) throws NamingException, SQLException, ServletException, IOException {
         Asiakas a = haeAsiakkaanTiedot(request);
         try {
-            List<Oirekuvaus> k = Oirekuvaus.haeOirekuvauksetAsiakasIdlla(a.getId());
+            List<Oirekuvaus> o = Oirekuvaus.haeOirekuvauksetAsiakasIdlla(a.getId());
             List<String> pvm = new ArrayList<String>();
-            for (Oirekuvaus o : k) {
+            for (Oirekuvaus k : o) {
                 SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy hh:mm:ss");
-                String muokattava = format.format(o.getLisaysajankohta());
+                String muokattava = format.format(k.getLisaysajankohta());
                 pvm.add(muokattava);
             }
             request.setAttribute("lisaysajankohdatOirekuvaus", pvm);
-            request.setAttribute("oirekuvaukset", k);
-        } catch (Exception r) {
-            naytaVirheSivu("Tietokannasta haku epäonnistui", request, response);
+            request.setAttribute("oirekuvaukset", o);
+        } catch (Exception e) {
+            naytaVirheSivu("Oirekuvausten haku tietokannasta epäonnistui.", request, response);
         }
     }
 
     public boolean palaaEtusivulleNapinPainallus(HttpServletRequest request) {
         return request.getParameter("etusivulle") != null;
+    }
+
+    public boolean lisaaHoitoOhjeNapinPainallus(HttpServletRequest request) {
+        return request.getParameter("lisaaHoitoOhje") != null;
+    }
+
+    public boolean poistaHoitoOhjeNapinPainallus(HttpServletRequest request) {
+        return request.getParameter("poistaHoitoOhje") != null;
+    }
+
+    public void lahetaTyhjanHoitoOhjeenTiedotLisaaPotilasRaporttiServletille(HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        String asiakasId = request.getParameter("lisaaHoitoOhje");
+        String varauksenId = request.getParameter("hoitoOhjeenVarattavaAikaId");
+        session.setAttribute("asiakasId", asiakasId);
+        session.setAttribute("varausId", varauksenId);
     }
 }

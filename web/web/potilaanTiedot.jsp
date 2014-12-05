@@ -6,6 +6,7 @@
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@taglib prefix="t" tagdir="/WEB-INF/tags" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -46,51 +47,78 @@
                             <th>Oireet</th>
                             <th colspan="2">Hoito-ohje</th>
                         </tr>
-                        <c:forEach var="oire" items="${oirekuvaukset}" varStatus="paikka">
-                            <tr>
-                                <td><c:out value="${lisaysajankohdatOirekuvaus[paikka.index]}" /></td>
-                                <td><c:out value="${oire.lisattavaTeksti}" /></td>
-                                <td>
-                                    <c:forEach var="hoitoOhje" items="${hoito_ohjeet}">
-                                        <c:if test="${hoitoOhje.varattavaAikaId == oire.varattavaAikaId}">
-                                            <c:out value="${hoitoOhje.lisattavaTeksti}" />
+                        <c:choose>
+                            <c:when test="${empty oirekuvaukset}">
+                                <tr>
+                                    <td><div class="col-xs-3 alert alert-info">Ei lisättyjä oireita</div></td>
+                                </tr>
+                            </c:when>
+                            <c:otherwise>
+                                <c:forEach var="oire" items="${oirekuvaukset}" varStatus="paikka">                            
+                                    <tr>
+                                        <td><c:out value="${lisaysajankohdatOirekuvaus[paikka.index]}" /></td>
+                                        <td><c:out value="${oire.lisattavaTeksti}" /></td>
+                                        <td>
+                                            <c:choose>
+                                                <c:when test="${empty hoitoOhjeet[paikka.index].lisattavaTeksti}">
+                                                    <div class="alert alert-info">Ei lisättyä hoito-ohjetta</div>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <c:out value="${hoitoOhjeet[paikka.index].lisattavaTeksti}" />
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </td>
+                                        <c:if test="${empty hoitoOhjeet[paikka.index].lisattavaTeksti}">
+                                            <td>    
+                                                <form>
+                                                    <input class="hidden" name="hoitoOhjeenVarattavaAikaId" value="${oire.varattavaAikaId}" />
+                                                    <button class="btn btn-default" type="submit" name="lisaaHoitoOhje" value="${oire.asiakasId}">Lisää hoito-ohje</button>
+                                                </form>
+                                            </td>
+                                        </c:if>
+                                        <c:if test="${hoitoOhjeet[paikka.index].lisattavaTeksti != null}">
+                                            <td>
+                                                <form>
+                                                    <input class="hidden" name="hoitoOhjeenId" value="${hoitoOhjeet[paikka.index].id}" />
+                                                    <input class="btn btn-default" type="submit" name="poistaHoitoOhje" value="Poista hoito-ohje" />
+                                                </form>
+                                            </td>
                                         </c:if>
                                     </c:forEach>
-                                </td>
-                                <td></td>
-                            </tr
-                        </c:forEach>
-                            <!--<tr>
-                        <td>15.11.2014, 15:02</td>
-                        <td>Pää kipee</td>
-                        <td>2*400 mg Buranaa</td>
-                        <td><a href="luo_potilastieto.html" class="btn btn-default">Muokkaa hoito-ohjetta</a></td>
-                    </tr>
-                    <tr>
-                        <td>20.11.2014, 12:18</td>
-                        <td>Borrelioosi</td>
-                        <td>Doksisykliini-kuuri</td>
-                        <td><a href="luo_potilastieto.html" class="btn btn-default">Muokkaa hoito-ohjetta</a></td>
-                    </tr>!-->
-                </table>
-            </div>
-            <div id="potilasraportit" class="tab-pane">
-                <table class="table table-bordered">
-                    <tr>
-                        <th>Lisäysajankohta</th>
-                        <th colspan="2">Raportti</th>
-                    </tr>
-                    <c:forEach var="raportti" items="${potilasraportit}" varStatus="monesko">
+                                </c:otherwise>
+                            </c:choose>
+                            <c:if test="${onnistunutPoisto != null}">
+                            <tr>
+                                <td><div class="alert alert-info"><c:out value="${onnistunutPoisto}" /></div></td>
+                            </tr>
+                        </c:if>
+                    </table>
+                </div>
+                <div id="potilasraportit" class="tab-pane">
+                    <table class="table table-bordered">
                         <tr>
-                            <td><c:out value="${lisaysajankohdatPotilasraportti[monesko.index]}" /></td>
-                            <td><c:out value="${raportti.lisattavaTeksti}" /></td>
-                            <td><a href="luo_potilastieto.html" class="btn btn-default">Muokkaa potilasraporttia</a></td>
+                            <th>Lisäysajankohta</th>
+                            <th colspan="2">Raportti</th>
                         </tr>
-                    </c:forEach>
-                </table>
+                        <c:choose>
+                            <c:when test="${empty potilasraportit}">
+                                <tr>
+                                    <td><div class="col-xs-3 alert alert-info">Ei potilasraportteja</div></td>
+                                </tr>
+                            </c:when>
+                            <c:otherwise>
+                                <c:forEach var="raportti" items="${potilasraportit}" varStatus="monesko">
+                                    <tr>
+                                        <td><c:out value="${lisaysajankohdatPotilasraportti[monesko.index]}" /></td>
+                                        <td><c:out value="${raportti.lisattavaTeksti}" /></td>
+                                    </tr>
+                                </c:forEach>
+                            </c:otherwise>
+                        </c:choose>
+                    </table>
+                </div>
             </div>
         </div>
-    </div>
-    <script src="js/bootstrap.js"></script>
-</body>
+        <script src="js/bootstrap.js"></script>
+    </body>
 </html>

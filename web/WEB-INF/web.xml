@@ -53,8 +53,12 @@
         <servlet-class>Servletit.PotilaanTiedotServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>PotilastiedonKasittelyServlet</servlet-name>
-        <servlet-class>Servletit.PotilastiedonKasittelyServlet</servlet-class>
+        <servlet-name>LisaaHoitoOhjeServlet</servlet-name>
+        <servlet-class>Servletit.LisaaHoitoOhjeServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>LisaaPotilasraporttiServlet</servlet-name>
+        <servlet-class>Servletit.LisaaPotilasraporttiServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>SQLTesti2</servlet-name>
@@ -109,8 +113,12 @@
         <url-pattern>/potilaantiedot</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>PotilastiedonKasittelyServlet</servlet-name>
-        <url-pattern>/potilastiedonkasittely</url-pattern>
+        <servlet-name>LisaaHoitoOhjeServlet</servlet-name>
+        <url-pattern>/lisaahoitoohje</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>LisaaPotilasraporttiServlet</servlet-name>
+        <url-pattern>/lisaapotilasraportti</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

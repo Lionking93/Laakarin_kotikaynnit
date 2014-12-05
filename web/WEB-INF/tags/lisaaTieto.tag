@@ -14,7 +14,8 @@
 <%@attribute name="tokanTiedonArvo" %>
 <%@attribute name="kolmasTieto" %>
 <%@attribute name="kolmannenTiedonArvo" %>
-<%@attribute name="tekstikentta" %>
+<%@attribute name="tekstikentanNimi" %>
+<%@attribute name="tekstikentanArvo" %>
 <%@attribute name="tekstikentanSisalto" %>
 
 <%-- any content can be specified here e.g.: --%>
@@ -53,7 +54,7 @@
                 <t:virhe></t:virhe>
             </p>
             <div class="row">
-                <textarea class="col-xs-5" name="${tekstikentta}" rows="4"><c:out value="${syotettyTeksti.kuvaus}" /></textarea>
+                <textarea class="col-xs-5" name="${tekstikentanNimi}" rows="4"><c:out value="${tekstikentanArvo}" /></textarea>
                 <div class="col-xs-7"></div>
             </div>
             <jsp:doBody/>

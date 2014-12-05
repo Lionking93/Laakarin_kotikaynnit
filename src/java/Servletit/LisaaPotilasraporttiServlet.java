@@ -22,7 +22,7 @@ import javax.servlet.http.HttpSession;
  *
  * @author leo
  */
-public class PotilastiedonKasittelyServlet extends EmoServlet {
+public class LisaaPotilasraporttiServlet extends EmoServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -33,7 +33,6 @@ public class PotilastiedonKasittelyServlet extends EmoServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
-    @Override
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
@@ -50,27 +49,15 @@ public class PotilastiedonKasittelyServlet extends EmoServlet {
                         Collection<String> virheet = p.getVirheet();
                         request.setAttribute("syotettyTeksti", p);
                         request.setAttribute("virheViesti", virheet.toArray()[0]);
-                        naytaSivu(request, response, "web/luoPotilastieto.jsp");
+                        naytaSivu(request, response, "web/lisaaPotilasraportti.jsp");
                     }
-                } else if (lisaaHoitoOhjeNapinPainallus(request)) {
-                    HoitoOhje h = luoHoitoOhje(request);
-                    if (h.onkoKelvollinen()) {
-                        h.lisaaKuvausKantaan();
-                        lahetaTietoOnnistuneestaLisayksesta(request, "Hoito-ohje lisätty onnistuneesti.");
-                        response.sendRedirect("potilaantiedot");
                     } else {
-                        Collection<String> virheet = h.getVirheet();
-                        request.setAttribute("syotettyTeksti", h);
-                        request.setAttribute("virheViesti", virheet.toArray()[0]);
-                        naytaSivu(request, response, "web/luoPotilastieto.jsp");
-                    }
-                } else {
-                    naytaSivu(request, response, "web/luoPotilastieto.jsp");
+                    naytaSivu(request, response, "web/lisaaPotilasraportti.jsp");
                 }
             } catch (NamingException ex) {
-                Logger.getLogger(PotilastiedonKasittelyServlet.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(LisaaHoitoOhjeServlet.class.getName()).log(Level.SEVERE, null, ex);
             } catch (SQLException ex) {
-                Logger.getLogger(PotilastiedonKasittelyServlet.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(LisaaHoitoOhjeServlet.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -114,7 +101,7 @@ public class PotilastiedonKasittelyServlet extends EmoServlet {
         return "Short description";
     }// </editor-fold>
 
-    public Asiakas haeAsiakkaanTiedot(HttpServletRequest request) throws NamingException, SQLException {
+public Asiakas haeAsiakkaanTiedot(HttpServletRequest request) throws NamingException, SQLException {
         HttpSession session = request.getSession();
         String asiakasIdTeksti = (String) session.getAttribute("asiakasId");
         int asiakasId = Integer.parseInt(asiakasIdTeksti);
@@ -142,12 +129,6 @@ public class PotilastiedonKasittelyServlet extends EmoServlet {
         session.setAttribute("onnistunutLisays", lisays);
     }
 
-    public HoitoOhje luoHoitoOhje(HttpServletRequest request) throws NamingException, SQLException {
-        HoitoOhje h = new HoitoOhje();
-        lisaaPotilastiedonAttribuutit(request, h);
-        return h;
-    }
-
     public void lisaaPotilastiedonAttribuutit(HttpServletRequest request, Potilastieto p) throws SQLException, NamingException {
         p.setVarattavaAikaId(haeVarauksenTiedot(request).getId());
         p.setAsiakasId(haeAsiakkaanTiedot(request).getId());
@@ -163,9 +144,5 @@ public class PotilastiedonKasittelyServlet extends EmoServlet {
 
     public boolean lisaaPotilasraporttiNapinPainallus(HttpServletRequest request) {
         return request.getParameter("potilasraportti") != null;
-    }
-
-    public boolean lisaaHoitoOhjeNapinPainallus(HttpServletRequest request) {
-        return request.getParameter("hoito-ohje") != null;
     }
 }
