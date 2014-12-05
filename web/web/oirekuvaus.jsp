@@ -10,7 +10,7 @@
 <!DOCTYPE html>
 <t:lisaaTieto minkaTiedot="Ajanvarauksen tiedot" ekaTieto="Lääkärin nimi" ekanTiedonArvo="${laakarinNimi}" 
               tokaTieto="Varattavan ajan päivämäärä" tokanTiedonArvo="${ajanPvm}" kolmasTieto="Kellonaika"
-              kolmannenTiedonArvo="${laakarinAika}" tekstikentta="oirekuvaus" tekstikentanSisalto="Kuvaile allaolevaan kenttään oireitasi.">    
+              kolmannenTiedonArvo="${laakarinAika}" tekstikentanNimi="oirekuvaus" tekstikentanSisalto="Kuvaile allaolevaan kenttään oireitasi.">    
     <div>
         <input class="btn btn-default" name="varaaAika" value="Varaa aika" type="submit" />
         <input class="btn btn-default" name="palaaAjanvaraukseen" value="Palaa ajanvaraukseen" type="submit" />
