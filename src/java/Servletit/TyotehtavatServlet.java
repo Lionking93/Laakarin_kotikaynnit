@@ -1,19 +1,14 @@
 package Servletit;
 
-import Mallit.Asiakas;
 import Mallit.Kayttaja;
 import Mallit.Oirekuvaus;
-import Mallit.VarattavaAika;
+import Mallit.Varaus;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.naming.NamingException;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -41,31 +36,29 @@ public class TyotehtavatServlet extends EmoServlet {
             kirjauduUlos(request, response);
         } else if (onkoKirjautunut(request, response)) {
             try {
-                if (VarattavaAika.haeAjatLaakariIdlla(getKayttaja().getId()).isEmpty()) {
+                if (Varaus.haeAjatLaakariIdlla(getKayttaja().getId()).isEmpty()) {
                     request.setAttribute("tyotehtavienTila", "Sinulla ei ole tyotehtäviä.");
                     avaaSivunakyma(request, response, "tyotehtavat", "laakarinviikkoaikataulu", "potilaat", "web/tyotehtavat.jsp");
                 } else {
-                    if (kuittaaSuoritetuksiNapinPainallus(request)) {
-                        int asiakasId = Integer.parseInt(request.getParameter("kuittaus"));
-                        Kayttaja kayttaja = Asiakas.haeAsiakasIdlla(asiakasId);
+                    if (napinPainallus("kuittaus", request)) {
                         int varauksenId = Integer.parseInt((request.getParameter("varauksenId")));
-                        VarattavaAika.peruAika(kayttaja, varauksenId);
+                        Varaus.peruAika(varauksenId);
                         lahetaTyotehtavanTiedotLisaaPotilasRaporttiServletille(request);
                         response.sendRedirect("lisaapotilasraportti");
                     } else {
-                        List<VarattavaAika> tyot = VarattavaAika.haeAjatLaakariIdlla(getKayttaja().getId());
+                        List<Varaus> tyot = Varaus.haeAjatLaakariIdlla(getKayttaja().getId());
                         request.setAttribute("tyot", tyot);
                         List<Oirekuvaus> l = new ArrayList<Oirekuvaus>();
-                        for (VarattavaAika tyot1 : tyot) {
-                            Oirekuvaus oire = Oirekuvaus.haeOirekuvausVarattavaAikaIdlla(tyot1.getId());
+                        for (Varaus tyot1 : tyot) {
+                            Oirekuvaus oire = Oirekuvaus.haeOirekuvausVarausIdlla(tyot1.getId());
                             l.add(oire);
                         }
                         request.setAttribute("oireet", l);
                         avaaSivunakyma(request, response, "tyotehtavat", "laakarinviikkoaikataulu", "potilaat", "web/tyotehtavat.jsp");
                     }
                 }
-            } catch (NamingException e) {
-            } catch (SQLException e) {
+            } catch (Exception e) {
+                naytaVirheSivu("Lääkärin työtehtävien näyttäminen epäonnistui.", request, response);
             }
         }
     }
@@ -108,10 +101,6 @@ public class TyotehtavatServlet extends EmoServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
-
-    public boolean kuittaaSuoritetuksiNapinPainallus(HttpServletRequest request) {
-        return request.getParameter("kuittaus") != null;
-    }
 
     public void lahetaTyotehtavanTiedotLisaaPotilasRaporttiServletille(HttpServletRequest request) {
         HttpSession session = request.getSession();

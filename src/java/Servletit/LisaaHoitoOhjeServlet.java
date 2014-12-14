@@ -1,19 +1,16 @@
 package Servletit;
 
-import Mallit.Asiakas;
 import Mallit.HoitoOhje;
-import Mallit.Potilasraportti;
+import Mallit.Kayttaja;
 import Mallit.Potilastieto;
-import Mallit.VarattavaAika;
+import Mallit.Varaus;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.naming.NamingException;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -22,7 +19,7 @@ import javax.servlet.http.HttpSession;
  *
  * @author leo
  */
-public class LisaaHoitoOhjeServlet extends EmoServlet {
+public class LisaaHoitoOhjeServlet extends LisaaPotilasTietoServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -40,7 +37,7 @@ public class LisaaHoitoOhjeServlet extends EmoServlet {
         if (onkoKirjautunut(request, response)) {
             try {
                 asetaAsiakkaanTiedot(request);
-                if (lisaaHoitoOhjeNapinPainallus(request)) {
+                if (napinPainallus("lisaaHoitoOhje", request)) {
                     HoitoOhje h = luoHoitoOhje(request);
                     if (h.onkoKelvollinen()) {
                         h.lisaaKuvausKantaan();
@@ -55,10 +52,8 @@ public class LisaaHoitoOhjeServlet extends EmoServlet {
                 } else {
                     naytaSivu(request, response, "web/lisaaHoitoOhje.jsp");
                 }
-            } catch (NamingException ex) {
-                Logger.getLogger(LisaaHoitoOhjeServlet.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (SQLException ex) {
-                Logger.getLogger(LisaaHoitoOhjeServlet.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (Exception e) {
+                naytaVirheSivu("Hoito-ohjeen lisäämisessä tapahtui virhe.", request, response);
             }
         }
     }
@@ -102,48 +97,9 @@ public class LisaaHoitoOhjeServlet extends EmoServlet {
         return "Short description";
     }// </editor-fold>
 
-    public Asiakas haeAsiakkaanTiedot(HttpServletRequest request) throws NamingException, SQLException {
-        HttpSession session = request.getSession();
-        String asiakasIdTeksti = (String) session.getAttribute("asiakasId");
-        int asiakasId = Integer.parseInt(asiakasIdTeksti);
-        Asiakas a = Asiakas.haeAsiakasIdlla(asiakasId);
-        return a;
-    }
-
-    public VarattavaAika haeVarauksenTiedot(HttpServletRequest request) throws SQLException, NamingException {
-        HttpSession session = request.getSession();
-        String varausIdTeksti = (String) session.getAttribute("varausId");
-        int varausId = Integer.parseInt(varausIdTeksti);
-        VarattavaAika v = VarattavaAika.haeVarattavaAikaIdlla(varausId);
-        return v;
-    }
-
-    public void asetaAsiakkaanTiedot(HttpServletRequest request) throws NamingException, SQLException {
-        Asiakas a = haeAsiakkaanTiedot(request);
-        request.setAttribute("asiakkaanNimi", a.getNimi());
-        request.setAttribute("asiakkaanHetu", a.getHenkilotunnus());
-        request.setAttribute("asiakkaanOsoite", a.getOsoite());
-    }
-
-    public void lahetaTietoOnnistuneestaLisayksesta(HttpServletRequest request, String lisays) {
-        HttpSession session = request.getSession();
-        session.setAttribute("onnistunutLisays", lisays);
-    }
-
     public HoitoOhje luoHoitoOhje(HttpServletRequest request) throws NamingException, SQLException {
         HoitoOhje h = new HoitoOhje();
         lisaaPotilastiedonAttribuutit(request, h);
         return h;
-    }
-
-    public void lisaaPotilastiedonAttribuutit(HttpServletRequest request, Potilastieto p) throws SQLException, NamingException {
-        p.setVarattavaAikaId(haeVarauksenTiedot(request).getId());
-        p.setAsiakasId(haeAsiakkaanTiedot(request).getId());
-        p.setLisaysajankohta(luoLisaysajankohta());
-        p.setLisattavaTeksti(request.getParameter("potilastieto"));
-    }
-
-    public boolean lisaaHoitoOhjeNapinPainallus(HttpServletRequest request) {
-        return request.getParameter("lisaaHoitoOhje") != null;
     }
 }

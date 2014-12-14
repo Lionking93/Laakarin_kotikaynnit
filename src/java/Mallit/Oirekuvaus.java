@@ -20,23 +20,22 @@ import javax.naming.NamingException;
 public class Oirekuvaus extends Potilastieto {
     
     public Oirekuvaus(int id, int varattava_aika_id, int asiakas_id, Timestamp lisaysajankohta, String kuvaus) {
-        super(id, varattava_aika_id, asiakas_id, lisaysajankohta, kuvaus);
+        super(id, varattava_aika_id, lisaysajankohta, kuvaus);
     }
     
     public Oirekuvaus(ResultSet rs) throws SQLException {
-        super.id = rs.getInt("id");
-        super.varattavaAikaId = rs.getInt("oirekuvaus_varattava_aika_id");
-        super.asiakas_id = rs.getInt("oirekuvaus_asiakas_id");
-        super.lisaysajankohta = rs.getTimestamp("lisaysajankohta");
-        super.lisattavaTeksti = rs.getString("kuvaus");
+        this.id = rs.getInt("id");
+        this.varausId = rs.getInt("varaus_id");
+        this.lisaysajankohta = rs.getTimestamp("lisaysajankohta");
+        this.lisattavaTeksti = rs.getString("kuvaus");
     }
     
     public Oirekuvaus() {}
     
-    public static Oirekuvaus haeOirekuvausVarattavaAikaIdlla(int id) throws NamingException, SQLException {
+    public static Oirekuvaus haeOirekuvausVarausIdlla(int id) throws NamingException, SQLException {
         Yhteys tietokanta = new Yhteys();
         Connection yhteys = tietokanta.getYhteys();
-        String sql = "SELECT oirekuvaus.id, oirekuvaus.oirekuvaus_varattava_aika_id, oirekuvaus.oirekuvaus_asiakas_id, oirekuvaus.lisaysajankohta, oirekuvaus.kuvaus FROM oirekuvaus, varattava_aika WHERE oirekuvaus.oirekuvaus_varattava_aika_id = varattava_aika.id AND varattava_aika.id = ?";
+        String sql = "SELECT * FROM Oirekuvaus WHERE Oirekuvaus.varaus_id = ?";
         PreparedStatement kysely = yhteys.prepareStatement(sql);
         kysely.setInt(1, id);
         ResultSet rs = kysely.executeQuery();
@@ -44,43 +43,37 @@ public class Oirekuvaus extends Potilastieto {
         if (rs.next()) {
             o = new Oirekuvaus(rs);
         }
-        try { rs.close(); } catch (Exception e) {}
-        try { kysely.close(); } catch (Exception e) {}
-        try { yhteys.close(); } catch (Exception e) {}
+        suljeResurssit(rs, kysely, yhteys);
         return o;
     }
     
     public static List<Oirekuvaus> haeOirekuvauksetAsiakasIdlla(int id) throws NamingException, SQLException {
         Yhteys tietokanta = new Yhteys();
         Connection yhteys = tietokanta.getYhteys();
-        String sql = "SELECT Oirekuvaus.id, Oirekuvaus.oirekuvaus_varattava_aika_id, Oirekuvaus.oirekuvaus_asiakas_id, oirekuvaus.lisaysajankohta, oirekuvaus.kuvaus FROM Oirekuvaus, Asiakas WHERE Oirekuvaus.oirekuvaus_asiakas_id = Asiakas.id AND Asiakas.id = ? ORDER BY oirekuvaus_varattava_aika_id asc";
+        String sql = "SELECT Oirekuvaus.id, Oirekuvaus.varaus_id, Oirekuvaus.lisaysajankohta, Oirekuvaus.kuvaus FROM Oirekuvaus, Varaus, Kayttaja WHERE Oirekuvaus.varaus_id = Varaus.id AND Varaus.asiakas_id = Kayttaja.id AND Kayttaja.id = ? ORDER BY Oirekuvaus.varaus_id asc";
         PreparedStatement kysely = yhteys.prepareStatement(sql);
         kysely.setInt(1, id);
         ResultSet rs = kysely.executeQuery();
         List<Oirekuvaus> o = new ArrayList<Oirekuvaus>();
         while (rs.next()) {
-            Oirekuvaus uusiOire = new Oirekuvaus();
-            uusiOire.setId(rs.getInt("id"));
-            uusiOire.setVarattavaAikaId(rs.getInt("oirekuvaus_varattava_aika_id"));
-            uusiOire.setAsiakasId(rs.getInt("oirekuvaus_asiakas_id"));
-            uusiOire.setLisaysajankohta(rs.getTimestamp("lisaysajankohta"));
-            uusiOire.setLisattavaTeksti(rs.getString("kuvaus"));
+            Oirekuvaus uusiOire = new Oirekuvaus(rs);
             o.add(uusiOire);
         }
+        suljeResurssit(rs, kysely, yhteys);
         return o;
     }
     
     public void lisaaKuvausKantaan() throws NamingException, SQLException {
         Yhteys tietokanta = new Yhteys();
         Connection yhteys = tietokanta.getYhteys();
-        String sql = "INSERT INTO Oirekuvaus(oirekuvaus_varattava_aika_id, oirekuvaus_asiakas_id, lisaysajankohta, kuvaus) VALUES(?, ?, ?, ?) RETURNING id";
+        String sql = "INSERT INTO Oirekuvaus(varaus_id, lisaysajankohta, kuvaus) VALUES(?, ?, ?) RETURNING id";
         suoritaLisays(yhteys, sql);
     }
     
     public static void poistaOirekuvaus(int id) throws NamingException, SQLException {
         Yhteys tietokanta = new Yhteys();
         Connection yhteys = tietokanta.getYhteys();
-        String sql = "DELETE FROM Oirekuvaus WHERE Oirekuvaus.oirekuvaus_varattava_aika_id = ?";
+        String sql = "DELETE FROM Oirekuvaus WHERE Oirekuvaus.varaus_id = ?";
         PreparedStatement kysely = yhteys.prepareStatement(sql);
         kysely.setInt(1, id);
         kysely.executeUpdate();

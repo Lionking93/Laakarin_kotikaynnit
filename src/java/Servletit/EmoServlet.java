@@ -1,10 +1,15 @@
 package Servletit;
 
-import Mallit.Asiakas;
 import Mallit.Kayttaja;
 import java.io.IOException;
+import java.sql.Date;
 import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -86,6 +91,10 @@ public class EmoServlet extends HttpServlet {
         request.setAttribute("virheViesti", virhe);
     }
 
+    protected void onnistunutLisays(String onnistui, HttpServletRequest request) {
+        request.setAttribute("onnistunutLisays", onnistui);
+    }
+
     public void naytaVirheSivu(String virheviesti, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         asetaVirhe(virheviesti, request);
         naytaSivu(request, response, "web/sqlVirheSivu.jsp");
@@ -112,6 +121,10 @@ public class EmoServlet extends HttpServlet {
             naytaSivu(request, response, "web/kirjautuminen.jsp");
             return false;
         }
+    }
+
+    protected boolean napinPainallus(String nappi, HttpServletRequest request) {
+        return request.getParameter(nappi) != null;
     }
 
     protected boolean kirjaudutaankoUlos(HttpServletRequest request) {
@@ -141,5 +154,37 @@ public class EmoServlet extends HttpServlet {
         long nykyhetkiMillisekunneissa = uusiPaiva.getTimeInMillis();
         Timestamp tamaHetki = new Timestamp(nykyhetkiMillisekunneissa);
         return tamaHetki;
+    }
+
+    protected static List<String> lataaPaivat(Calendar c) {
+        List<String> viikonPaivat = new ArrayList<String>();
+        DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
+        for (int i = 0; i < 6; i++) {
+            viikonPaivat.add(df.format(c.getTime()));
+            c.add(Calendar.DATE, 1);
+        }
+        return viikonPaivat;
+    }
+
+    protected static Calendar haeTamaPaiva() {
+        Calendar c = Calendar.getInstance();
+        c.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+        c.add(Calendar.DATE, -1);
+        return c;
+    }
+
+    protected Date muunnaTyopaivamaara(String paiva) throws ParseException {
+        DateFormat format = new SimpleDateFormat("dd.MM.yyyy");
+        java.util.Date pvm = format.parse(paiva);
+        java.sql.Date sqlPvm = new java.sql.Date(pvm.getTime());
+        return sqlPvm;
+    }
+
+    protected List<String> haeNykyisenViikonPaivamaarat(HttpServletRequest request) {
+        Calendar c = haeTamaPaiva();
+        HttpSession session = request.getSession();
+        int kuinkaPaljon = Integer.parseInt((String) session.getAttribute("siirtyma"));
+        c.add(Calendar.DATE, kuinkaPaljon * 7);
+        return lataaPaivat(c);
     }
 }

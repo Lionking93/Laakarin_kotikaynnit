@@ -1,22 +1,18 @@
 package Servletit;
 
+import Mallit.Aikaslotti;
 import Mallit.Kayttaja;
 import Mallit.Oirekuvaus;
-import Mallit.VarattavaAika;
+import Mallit.Paiva;
+import Mallit.Varaus;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.sql.Date;
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import java.text.ParseException;
 import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.naming.NamingException;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -43,14 +39,18 @@ public class OirekuvausServlet extends EmoServlet {
         if (kirjaudutaankoUlos(request)) {
             kirjauduUlos(request, response);
         } else if (onkoKirjautunut(request, response)) {
-            asetaAjanvarauksenTiedot(request);
-            if (varaaAikaNapinPainallus(request)) {
+            try {
+                asetaAjanvarauksenTiedot(request, response);
+            } catch (Exception e) {
+                naytaVirheSivu("Ajanvarauksen tietojen näyttäminen epäonnistui.", request, response);
+            }
+            if (napinPainallus("varaaAika", request)) {
                 try {
-                    Kayttaja kayttaja = getKayttaja();
-                    int nroId = haeAjanvarauksenId(request);
-                    VarattavaAika.lisaaAsiakasId(kayttaja, nroId);
+                    Varaus v = luoVaraus(request, response);
                     Oirekuvaus k = luoOirekuvaus(request);
                     if (k.onkoKelvollinen()) {
+                        v.luoVaraus();
+                        k.setVarausId(v.getId());
                         k.lisaaKuvausKantaan();
                         lahetaVaraustietoOmatVarauksetServletille(request);
                         response.sendRedirect("omatvaraukset");
@@ -60,12 +60,10 @@ public class OirekuvausServlet extends EmoServlet {
                         request.setAttribute("virheViesti", virheet.toArray()[0]);
                         naytaSivu(request, response, "web/oirekuvaus.jsp");
                     }
-                } catch (NamingException ex) {
-                    Logger.getLogger(OirekuvausServlet.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (SQLException ex) {
-                    Logger.getLogger(OirekuvausServlet.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (Exception e) {
+                    naytaVirheSivu("Varauksen ja oirekuvauksen luominen epäonnistui.", request, response);
                 }
-            } else if (palaaAjanvaraukseenNapinPainallus(request)) {
+            } else if (napinPainallus("palaaAjanvaraukseen", request)) {
                 response.sendRedirect("viikkoaikataulu");
             } else {
                 naytaSivu(request, response, "web/oirekuvaus.jsp");
@@ -112,22 +110,58 @@ public class OirekuvausServlet extends EmoServlet {
         return "Short description";
     }// </editor-fold>
 
-    public void asetaAjanvarauksenTiedot(HttpServletRequest request) {
+    public void asetaAjanvarauksenTiedot(HttpServletRequest request, HttpServletResponse response) throws NamingException, SQLException, ServletException, IOException {
+        request.setAttribute("ajanPvm", haeVarausAjanPaivamaara(request, response));
+        request.setAttribute("laakarinNimi", haeLaakari(request, response).getNimi());
+        request.setAttribute("laakarinAika", haeAikaslotti(request, response).getAikaslotti());
+        request.setAttribute("paiva", haePaiva(request, response).getPaiva());
+    }
+
+    public Paiva haePaiva(HttpServletRequest request, HttpServletResponse response) throws NamingException, SQLException, ServletException, IOException {
         HttpSession session = request.getSession();
-        String ajanPvm = (String) session.getAttribute("ajanPvm");
-        request.setAttribute("ajanPvm", ajanPvm);
-        String laakarinNimi = (String) session.getAttribute("laakarinNimi");
-        request.setAttribute("laakarinNimi", laakarinNimi);
-        String laakarinAika = (String) session.getAttribute("laakarinAika");
-        request.setAttribute("laakarinAika", laakarinAika);
+        Paiva paiva = null;
+        try {
+            int paivaId = (Integer) session.getAttribute("paivaId");
+            paiva = Paiva.haePaivaIdlla(paivaId);
+        } catch (Exception e) {
+            naytaVirheSivu("Päivän hakeminen epäonnistui.", request, response);
+        }
+        return paiva;
     }
 
-    public boolean varaaAikaNapinPainallus(HttpServletRequest request) {
-        return request.getParameter("varaaAika") != null;
+    public Aikaslotti haeAikaslotti(HttpServletRequest request, HttpServletResponse response) throws NamingException, SQLException, ServletException, IOException {
+        HttpSession session = request.getSession();
+        Aikaslotti aikaslotti = null;
+        try {
+            int aikaslottiId = (Integer) session.getAttribute("aikaslottiId");
+            aikaslotti = Aikaslotti.haeAikaslottiIdlla(aikaslottiId);
+        } catch (Exception e) {
+            naytaVirheSivu("Aikaslotin hakeminen epäonnistui.", request, response);
+        }
+        return aikaslotti;
     }
 
-    public boolean palaaAjanvaraukseenNapinPainallus(HttpServletRequest request) {
-        return request.getParameter("palaaAjanvaraukseen") != null;
+    public Kayttaja haeLaakari(HttpServletRequest request, HttpServletResponse response) throws NamingException, SQLException, ServletException, IOException {
+        HttpSession session = request.getSession();
+        Kayttaja laakari = null;
+        try {
+            int laakarinId = (Integer) session.getAttribute("laakarinId");
+            laakari = Kayttaja.haeKayttajaIdlla(laakarinId);
+        } catch (Exception e) {
+            naytaVirheSivu("Lääkärin hakeminen epäonnistui.", request, response);
+        }
+        return laakari;
+    }
+
+    public String haeVarausAjanPaivamaara(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        String ajanPvm = "";
+        try {
+            ajanPvm = (String) session.getAttribute("ajanPvm");
+        } catch (Exception r) {
+            naytaVirheSivu("Päivämäärän hakeminen epäonnistui.", request, response);
+        }
+        return ajanPvm;
     }
 
     public void lahetaVaraustietoOmatVarauksetServletille(HttpServletRequest request) {
@@ -135,17 +169,18 @@ public class OirekuvausServlet extends EmoServlet {
         session.setAttribute("varaustieto", "Varaus lisätty onnistuneesti!");
     }
 
-    public int haeAjanvarauksenId(HttpServletRequest request) {
-        HttpSession session = request.getSession();
-        String ajanId = (String) session.getAttribute("ajanId");
-        int idNro = Integer.parseInt(ajanId);
-        return idNro;
+    public Varaus luoVaraus(HttpServletRequest request, HttpServletResponse response) throws NamingException, SQLException, ParseException, ServletException, IOException {
+        Varaus v = new Varaus();
+        v.setAikaslotti(haeAikaslotti(request, response));
+        v.setPaiva(haePaiva(request, response));
+        v.setAsiakas(getKayttaja());
+        v.setLaakari(haeLaakari(request, response));
+        v.setLisaysajankohta(muunnaTyopaivamaara(haeVarausAjanPaivamaara(request, response)));
+        return v;
     }
 
     public Oirekuvaus luoOirekuvaus(HttpServletRequest request) throws NamingException, SQLException {
         Oirekuvaus k = new Oirekuvaus();
-        k.setVarattavaAikaId(haeAjanvarauksenId(request));
-        k.setAsiakasId(getKayttaja().getId());
         k.setLisaysajankohta(luoLisaysajankohta());
         k.setLisattavaTeksti(request.getParameter("oirekuvaus"));
         return k;

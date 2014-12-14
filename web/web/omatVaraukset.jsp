@@ -9,19 +9,21 @@
 <%@taglib prefix="t" tagdir="/WEB-INF/tags"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
-<t:pohja kenenTili="Asiakas" aktiivinenEkaTab="active" ekaTab="Omat varaukset" tokaTab="Viikkoaikataulu" kolmasTab="Hoito-ohjeet">
+<t:pohja kenenTili="Asiakas" aktiivinenEkaTab="active" ekaTab="Omat varaukset" tokaTab="Valitse lääkäri" kolmasTab="Hoito-ohjeet">
     <div class="tab-pane active">
         <table class="table table-striped">
             <tr>
                 <th>Vastaava lääkäri</th>
                 <th colspan="2">Varauksen ajankohta</th>
+                <th>Oirekuvaus</th>
             </tr>
-            <c:forEach var="varaus" items="${varaukset}">
+            <c:forEach var="varaus" items="${varaukset}" varStatus="moneskoVaraus">
                 <tr>
-                    <td><c:out value="${varaus.laakari}" /></td>
-                    <td><c:out value="${varaus.viikonpaiva}, ${varaus.aika}" /></td>
+                    <td><c:out value="${varaus.laakari.nimi}" /></td>
+                    <td><c:out value="${varaus.paiva.paiva}, ${paivamaarat[moneskoVaraus.index]}, ${varaus.aikaslotti.aikaslotti}" /></td>
+                    <td><c:out value="${oirekuvaukset[moneskoVaraus.index].lisattavaTeksti}" /></td>
                     <td><t:ajanperuminen peruttavanAjanId="${varaus.id}"></t:ajanperuminen></td>
-                    </tr>
+                </tr>
             </c:forEach>
             <tr>
                 <td colspan="2">

@@ -5,10 +5,6 @@
         <servlet-class>Kokeilut.SQLTesti2</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>Listaustesti</servlet-name>
-        <servlet-class>Kokeilut.Listaustesti</servlet-class>
-    </servlet>
-    <servlet>
         <servlet-name>NewServlet</servlet-name>
         <servlet-class>Tietokanta.NewServlet</servlet-class>
     </servlet>
@@ -19,10 +15,6 @@
     <servlet>
         <servlet-name>Kirjautuminen</servlet-name>
         <servlet-class>Servletit.KirjautuminenServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>LaakariServlet</servlet-name>
-        <servlet-class>Servletit.LaakariServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ViikkoaikatauluServlet</servlet-name>
@@ -60,13 +52,21 @@
         <servlet-name>LisaaPotilasraporttiServlet</servlet-name>
         <servlet-class>Servletit.LisaaPotilasraporttiServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>PomoServlet</servlet-name>
+        <servlet-class>Servletit.PomoServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>AikatauluServlet</servlet-name>
+        <servlet-class>Servletit.AikatauluServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>PotilasTietoServlet</servlet-name>
+        <servlet-class>Servletit.LisaaPotilasTietoServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>SQLTesti2</servlet-name>
         <url-pattern>/SQLTesti2</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>Listaustesti</servlet-name>
-        <url-pattern>/Listaustesti</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>NewServlet</servlet-name>
@@ -79,10 +79,6 @@
     <servlet-mapping>
         <servlet-name>Kirjautuminen</servlet-name>
         <url-pattern>/login</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>LaakariServlet</servlet-name>
-        <url-pattern>/laakarinetusivu</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ViikkoaikatauluServlet</servlet-name>
@@ -119,6 +115,18 @@
     <servlet-mapping>
         <servlet-name>LisaaPotilasraporttiServlet</servlet-name>
         <url-pattern>/lisaapotilasraportti</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>PomoServlet</servlet-name>
+        <url-pattern>/pomonsivu</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AikatauluServlet</servlet-name>
+        <url-pattern>/AikatauluServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>PotilasTietoServlet</servlet-name>
+        <url-pattern>/PotilasTietoServlet</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

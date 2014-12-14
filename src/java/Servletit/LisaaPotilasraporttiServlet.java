@@ -1,19 +1,16 @@
 package Servletit;
 
-import Mallit.Asiakas;
-import Mallit.HoitoOhje;
+import Mallit.Kayttaja;
 import Mallit.Potilasraportti;
 import Mallit.Potilastieto;
-import Mallit.VarattavaAika;
+import Mallit.Varaus;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.naming.NamingException;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -22,7 +19,7 @@ import javax.servlet.http.HttpSession;
  *
  * @author leo
  */
-public class LisaaPotilasraporttiServlet extends EmoServlet {
+public class LisaaPotilasraporttiServlet extends LisaaPotilasTietoServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -39,7 +36,7 @@ public class LisaaPotilasraporttiServlet extends EmoServlet {
         if (onkoKirjautunut(request, response)) {
             try {
                 asetaAsiakkaanTiedot(request);
-                if (lisaaPotilasraporttiNapinPainallus(request)) {
+                if (napinPainallus("potilasraportti", request)) {
                     Potilasraportti p = luoPotilasraportti(request);
                     if (p.onkoKelvollinen()) {
                         p.lisaaKuvausKantaan();
@@ -51,13 +48,11 @@ public class LisaaPotilasraporttiServlet extends EmoServlet {
                         request.setAttribute("virheViesti", virheet.toArray()[0]);
                         naytaSivu(request, response, "web/lisaaPotilasraportti.jsp");
                     }
-                    } else {
+                } else {
                     naytaSivu(request, response, "web/lisaaPotilasraportti.jsp");
                 }
-            } catch (NamingException ex) {
-                Logger.getLogger(LisaaHoitoOhjeServlet.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (SQLException ex) {
-                Logger.getLogger(LisaaHoitoOhjeServlet.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (Exception e) {
+                naytaVirheSivu("Potilasraportin lisäämisessä tapahtui virhe.", request, response);
             }
         }
     }
@@ -101,48 +96,9 @@ public class LisaaPotilasraporttiServlet extends EmoServlet {
         return "Short description";
     }// </editor-fold>
 
-public Asiakas haeAsiakkaanTiedot(HttpServletRequest request) throws NamingException, SQLException {
-        HttpSession session = request.getSession();
-        String asiakasIdTeksti = (String) session.getAttribute("asiakasId");
-        int asiakasId = Integer.parseInt(asiakasIdTeksti);
-        Asiakas a = Asiakas.haeAsiakasIdlla(asiakasId);
-        return a;
-    }
-    
-    public VarattavaAika haeVarauksenTiedot(HttpServletRequest request) throws SQLException, NamingException {
-        HttpSession session = request.getSession();
-        String varausIdTeksti = (String) session.getAttribute("varausId");
-        int varausId = Integer.parseInt(varausIdTeksti);
-        VarattavaAika v = VarattavaAika.haeVarattavaAikaIdlla(varausId);
-        return v;
-    }
-
-    public void asetaAsiakkaanTiedot(HttpServletRequest request) throws NamingException, SQLException {
-        Asiakas a = haeAsiakkaanTiedot(request);
-        request.setAttribute("asiakkaanNimi", a.getNimi());
-        request.setAttribute("asiakkaanHetu", a.getHenkilotunnus());
-        request.setAttribute("asiakkaanOsoite", a.getOsoite());
-    }
-
-    public void lahetaTietoOnnistuneestaLisayksesta(HttpServletRequest request, String lisays) {
-        HttpSession session = request.getSession();
-        session.setAttribute("onnistunutLisays", lisays);
-    }
-
-    public void lisaaPotilastiedonAttribuutit(HttpServletRequest request, Potilastieto p) throws SQLException, NamingException {
-        p.setVarattavaAikaId(haeVarauksenTiedot(request).getId());
-        p.setAsiakasId(haeAsiakkaanTiedot(request).getId());
-        p.setLisaysajankohta(luoLisaysajankohta());
-        p.setLisattavaTeksti(request.getParameter("potilastieto"));
-    }
-
     public Potilasraportti luoPotilasraportti(HttpServletRequest request) throws NamingException, SQLException {
         Potilasraportti p = new Potilasraportti();
         lisaaPotilastiedonAttribuutit(request, p);
         return p;
-    }
-
-    public boolean lisaaPotilasraporttiNapinPainallus(HttpServletRequest request) {
-        return request.getParameter("potilasraportti") != null;
     }
 }

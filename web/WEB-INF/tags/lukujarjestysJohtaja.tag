@@ -3,6 +3,7 @@
     Created on : 18.11.2014, 12:43:21
     Author     : leo
 --%>
+
 <%@tag description="pohja lukujärjestykselle" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="t" tagdir="/WEB-INF/tags" %>
@@ -22,7 +23,7 @@
                     <h4>Valitse edellinen tai seuraava viikko</h4>
                 </td>
                 <td>
-                    <input class="btn btn-primary" name="ajanvaraus" type="submit" value="Hyväksy valinta" />
+                    <input class="btn btn-primary" name="lisaaTyovuorot" type="submit" value="Hyväksy valinnat" />
                 </td>
             </tr>
             <tr>
@@ -37,7 +38,7 @@
                     </button>
                 </td>
                 <td>
-                    <input class="btn btn-primary" name="palaaLaakarinValintaan" type="submit" value="Palaa lääkärin valintaan" />
+                    <input class="btn btn-primary" name="palaaLaakarinValintaan" type="submit" value="Palaa työntekijän valintaan" />
                 </td>
             </tr>
         </table>
@@ -52,15 +53,21 @@
             <tr>
                 <th><c:out value="${aika.aikaslotti}" /></th>
                     <c:forEach begin="1" end="5" varStatus="moneskoSarake">
+                        <c:set var="onkoToita" value="false" />
                     <td>
                         <c:forEach var="mvuoro" items="${maaratytVuorot}">
                             <c:if test="${mvuoro.tyopaivamaara == paivamaaratDatena[moneskoSarake.count] && mvuoro.paivaId == moneskoSarake.count && mvuoro.aikaslottiId == moneskoRivi.count}">
-                                <input type="radio" name="lisattyAika" value="${moneskoSarake.count}, ${moneskoRivi.count}, ${paivamaarat[moneskoSarake.count]}" />
+                                <input type="checkbox" checked disabled />
+                                <c:set var="onkoToita" value="true" />
                             </c:if>
                         </c:forEach>
+                        <c:if test="${onkoToita == 'false'}">
+                            <input type="checkbox" name="lisattyAika" value="${moneskoSarake.count}, ${moneskoRivi.count}, ${paivamaarat[moneskoSarake.count]}" />
+                        </c:if>
                     </td>
                 </c:forEach>
             </tr>
         </c:forEach>
     </table>
 </form>
+

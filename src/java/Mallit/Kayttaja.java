@@ -1,9 +1,12 @@
 package Mallit;
 
+import Servletit.Yhteys;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import javax.naming.NamingException;
 
 /**
@@ -13,38 +16,38 @@ import javax.naming.NamingException;
  */
 public class Kayttaja {
 
-    protected int id;
-    protected String nimi;
-    protected String tunnus;
-    protected String salasana;
-    protected String syntymaaika;
-    protected String henkilotunnus;
-    protected String osoite;
+    private int id;
+    private int kayttoOikeus;
+    private String nimi;
+    private String tunnus;
+    private String salasana;
+    private String syntymaaika;
+    private String henkilotunnus;
+    private String osoite;
 
-    public Kayttaja(int id, String nimi, String tunnus, String salasana, String syntymaaika, String henkilotunnus, String osoite) throws NamingException {
+    public Kayttaja(int id, int kayttoOikeus, String nimi, String tunnus, String salasana) throws NamingException {
         this.id = id;
+        this.kayttoOikeus = kayttoOikeus;
         this.nimi = nimi;
         this.tunnus = tunnus;
         this.salasana = salasana;
-        this.syntymaaika = syntymaaika;
-        this.henkilotunnus = henkilotunnus;
-        this.osoite = osoite;
     }
 
     public Kayttaja(ResultSet rs) throws SQLException {
         this.id = rs.getInt("id");
+        this.kayttoOikeus = rs.getInt("kaytto_oikeus");
         this.nimi = rs.getString("nimi");
         this.tunnus = rs.getString("tunnus");
         this.salasana = rs.getString("salasana");
-        /*this.syntymaaika = rs.getDate("syntymaaika").toString();
-        this.osoite = rs.getString("osoite");*/
-    }
-
-    public Kayttaja(int id, String nimi, String tunnus, String salasana) {
-        this.id = id;
-        this.nimi = nimi;
-        this.tunnus = tunnus;
-        this.salasana = salasana;
+        if (rs.getString("henkilotunnus") != null) {
+            this.henkilotunnus = rs.getString("henkilotunnus");
+        }
+        if (rs.getDate("syntymaaika") != null) {
+            this.syntymaaika = rs.getDate("syntymaaika").toString();
+        }
+        if (rs.getString("osoite") != null) {
+            this.osoite = rs.getString("osoite");
+        }
     }
 
     public Kayttaja() {
@@ -52,6 +55,10 @@ public class Kayttaja {
 
     public int getId() {
         return this.id;
+    }
+
+    public int getKayttoOikeus() {
+        return this.kayttoOikeus;
     }
 
     public String getNimi() {
@@ -82,6 +89,10 @@ public class Kayttaja {
         this.id = uusiId;
     }
 
+    public void setKayttoOikeus(int uusiKayttoOikeus) {
+        this.kayttoOikeus = uusiKayttoOikeus;
+    }
+
     public void setNimi(String uusiNimi) {
         this.nimi = uusiNimi;
     }
@@ -106,41 +117,84 @@ public class Kayttaja {
         this.osoite = uusiOsoite;
     }
 
-    public static Kayttaja haeKayttaja(PreparedStatement kysely, Connection yhteys) throws SQLException {
+    public static Kayttaja etsiKayttajaTunnuksilla(String username, String password) throws NamingException, SQLException {
+        String sql = "SELECT * FROM Kayttaja WHERE tunnus = ? AND salasana = ?";
+        Yhteys conn = new Yhteys();
+        Connection yhteys = conn.getYhteys();
+        PreparedStatement kysely = yhteys.prepareStatement(sql);
+        kysely.setString(1, username);
+        kysely.setString(2, password);
+        ResultSet rs = kysely.executeQuery();
+
+        Kayttaja kirjautunut = null;
+        if (rs.next()) {
+            kirjautunut = new Kayttaja(rs);
+        }
+        suljeResurssit(rs, kysely, yhteys);
+        return kirjautunut;
+    }
+
+    public static Kayttaja haeKayttajaIdlla(int id) throws NamingException, SQLException {
+        Yhteys tietokanta = new Yhteys();
+        Connection yhteys = tietokanta.getYhteys();
+        String sql = "SELECT * FROM kayttaja WHERE id = ?";
+        PreparedStatement kysely = yhteys.prepareStatement(sql);
+        kysely.setInt(1, id);
         ResultSet rs = kysely.executeQuery();
         Kayttaja kayttaja = null;
         if (rs.next()) {
-            /*if (!onkoAsiakasAttribuutteja(rs)) {
-                kayttaja = new Kayttaja(rs);
-            } else {
-                kayttaja = new Kayttaja(rs);
-                asetaAsiakasAttribuutit(rs, kayttaja);
-            }*/
             kayttaja = new Kayttaja(rs);
         }
-        try { rs.close(); } catch (Exception e) {}
+        suljeResurssit(rs, kysely, yhteys);
         return kayttaja;
     }
 
-    public static void asetaAsiakasAttribuutit(ResultSet rs, Kayttaja k) throws SQLException {
-        k.setHenkilotunnus(rs.getString("henkilotunnus"));
-        k.setOsoite(rs.getString("osoite"));
-        k.setSyntymaaika(rs.getDate("syntymaaika").toString());
+    public static List<Kayttaja> getKayttajat(int kayttoOikeus) throws NamingException, SQLException {
+        Yhteys tietokanta = new Yhteys();
+        Connection yhteys = tietokanta.getYhteys();
+        String sql = "SELECT * From Kayttaja WHERE Kaytto_oikeus = ?";
+        PreparedStatement kysely = yhteys.prepareStatement(sql);
+        kysely.setInt(1, kayttoOikeus);
+        ResultSet rs = kysely.executeQuery();
+        List<Kayttaja> asiakkaat = new ArrayList<Kayttaja>();
+        while (rs.next()) {
+            Kayttaja k = new Kayttaja(rs);
+            asiakkaat.add(k);
+        }
+        suljeResurssit(rs, kysely, yhteys);
+        return asiakkaat;
     }
-
-    public static boolean onkoAsiakasAttribuutteja(ResultSet rs) throws SQLException {
-        return onkoSyntymaaikaa(rs) && onkoHenkilotunnusta(rs) && onkoOsoitetta(rs) == true;
+    
+    public static List<Kayttaja> etsiLaakaritJoillaEiOleToitaAikaslotissa(int aikaslotti, int paiva) throws NamingException, SQLException {
+        Yhteys tietokanta = new Yhteys();
+        Connection yhteys = tietokanta.getYhteys();
+        String sql = "SELECT * FROM Kayttaja WHERE Kaytto_oikeus = 2 AND id NOT IN "
+                + "(SELECT kayttaja_id FROM Tyovuorot, Kayttaja WHERE Tyovuorot.kayttaja_id = Kayttaja.id AND Tyovuorot.aikaslotti_id = ? AND Tyovuorot.paiva_id = ?)";
+        PreparedStatement kysely = yhteys.prepareStatement(sql);
+        kysely.setInt(1, aikaslotti);
+        kysely.setInt(2, paiva);
+        ResultSet rs = kysely.executeQuery();
+        List<Kayttaja> laakarit = new ArrayList<Kayttaja>();
+        while (rs.next()) {
+            Kayttaja k = new Kayttaja(rs);
+            laakarit.add(k);
+        }
+        suljeResurssit(rs, kysely, yhteys);
+        return laakarit;
     }
-
-    public static boolean onkoSyntymaaikaa(ResultSet rs) throws SQLException {
-        return rs.getDate("syntymaaika") != null;
-    }
-
-    public static boolean onkoHenkilotunnusta(ResultSet rs) throws SQLException {
-        return rs.getString("henkilotunnus") != null;
-    }
-
-    public static boolean onkoOsoitetta(ResultSet rs) throws SQLException {
-        return rs.getString("osoite") != null;
+    
+    public static void suljeResurssit(ResultSet rs, PreparedStatement kysely, Connection yhteys) {
+        try {
+            rs.close();
+        } catch (Exception e) {
+        }
+        try {
+            kysely.close();
+        } catch (Exception e) {
+        }
+        try {
+            yhteys.close();
+        } catch (Exception e) {
+        }
     }
 }

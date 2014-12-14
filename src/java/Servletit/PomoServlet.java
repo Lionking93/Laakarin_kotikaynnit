@@ -1,7 +1,20 @@
 package Servletit;
 
+import Mallit.Aikaslotti;
+import Mallit.Kayttaja;
+import Mallit.Paiva;
+import Mallit.Tyovuorot;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.sql.Date;
+import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.naming.NamingException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -11,7 +24,7 @@ import javax.servlet.http.HttpSession;
  *
  * @author leo
  */
-public class ViikkoaikatauluServlet extends AikatauluServlet {
+public class PomoServlet extends AikatauluServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -34,8 +47,7 @@ public class ViikkoaikatauluServlet extends AikatauluServlet {
                 try {
                     session.setAttribute("laakarinId", request.getParameter("laakarinId"));
                     asetaSivunTiedot(request, response);
-                    asetaLaakarilleMaaratytVuorot(request, response);
-                    avaaSivunakyma(request, response, "omatvaraukset", "viikkoaikataulu", "hoito-ohjeet", "web/viikkoaikataulu.jsp");
+                    naytaTokaTab(request, response, "web/pomonTokatab.jsp");
                 } catch (Exception e) {
                     naytaVirheSivu("Lääkärin valitseminen epäonnistui.", request, response);
                 }
@@ -43,8 +55,7 @@ public class ViikkoaikatauluServlet extends AikatauluServlet {
                 try {
                     siirraKalenteria(request, "vasenNuoli");
                     asetaSivunTiedot(request, response);
-                    asetaLaakarilleMaaratytVuorot(request, response);
-                    avaaSivunakyma(request, response, "omatvaraukset", "viikkoaikataulu", "hoito-ohjeet", "web/viikkoaikataulu.jsp");
+                    naytaTokaTab(request, response, "web/pomonTokatab.jsp");
                 } catch (Exception e) {
                     naytaVirheSivu("Aikataulussa taaksepäin siirtyminen epäonnistui.", request, response);
                 }
@@ -52,25 +63,42 @@ public class ViikkoaikatauluServlet extends AikatauluServlet {
                 try {
                     siirraKalenteria(request, "oikeaNuoli");
                     asetaSivunTiedot(request, response);
-                    asetaLaakarilleMaaratytVuorot(request, response);
-                    avaaSivunakyma(request, response, "omatvaraukset", "viikkoaikataulu", "hoito-ohjeet", "web/viikkoaikataulu.jsp");
+                    naytaTokaTab(request, response, "web/pomonTokatab.jsp");
                 } catch (Exception e) {
                     naytaVirheSivu("Aikataulussa eteenpäin siirtyminen epäonnistui,", request, response);
                 }
+            } else if (napinPainallus("lisaaTyovuorot", request)) {
+                if (request.getParameterValues("lisattyTyovuoro") != null) {
+                    try {
+                        luoTyovuorot(request);
+                        onnistunutLisays("Työvuorot lisätty onnistuneesti!", request);
+                        asetaSivunTiedot(request, response);
+                        naytaTokaTab(request, response, "web/pomonTokatab.jsp");
+                    } catch (Exception e) {
+                        naytaVirheSivu("Työvuorojen lisääminen kantaan epäonnistui", request, response);
+                    }
+                } else {
+                    try {
+                        asetaVirhe("Et ole lisännyt työvuoroja!", request);
+                        asetaSivunTiedot(request, response);
+                        naytaTokaTab(request, response, "web/pomonTokatab.jsp");
+                    } catch (Exception e) {
+                        naytaVirheSivu("Tapahtui virhe, kun yritettiin lisätä olemattomia vuoroja.", request, response);
+                    }
+                }
             } else if (napinPainallus("palaaLaakarinValintaan", request)) {
-                lataaLaakarit(request, response);
-                avaaSivunakyma(request, response, "omatvaraukset", "viikkoaikataulu", "hoito-ohjeet", "web/viikkoaikatauluEkatab.jsp");
-            } else if (napinPainallus("ajanvaraus", request)) {
-                lahetaVaraustiedotOirekuvausServletille(request);
-                response.sendRedirect("oirekuvaus");
+                asetaSivunKayttajanNimi(request);
+                lataaResurssit(request, response);
+                naytaSivu(request, response, "web/pomonEkatab.jsp");
             } else {
-                lataaLaakarit(request, response);
-                avaaSivunakyma(request, response, "omatvaraukset", "viikkoaikataulu", "hoito-ohjeet", "web/viikkoaikatauluEkatab.jsp");
+                asetaSivunKayttajanNimi(request);
+                lataaResurssit(request, response);
+                naytaSivu(request, response, "web/pomonEkatab.jsp");
             }
         }
     }
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
+// <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
      *
@@ -109,24 +137,20 @@ public class ViikkoaikatauluServlet extends AikatauluServlet {
         return "Short description";
     }// </editor-fold>
 
-    public void lahetaVaraustiedotOirekuvausServletille(HttpServletRequest request) {
-        int paivaId = haePaivaTietoja(request, 0).get(0);
-        int aikaslottiId = haePaivaTietoja(request, 3).get(0);
-        String paivamaara = haePaivamaarat(request).get(0);
+    public void luoTyovuorot(HttpServletRequest request) throws ParseException, NamingException, SQLException {
+        List<Integer> paivaIdt = haePaivaTietoja(request, 0);
+        List<Integer> aikaslottiIdt = haePaivaTietoja(request, 3);
         HttpSession session = request.getSession();
         String laakarinIdTeksti = (String) session.getAttribute("laakarinId");
         int laakarinId = Integer.parseInt(laakarinIdTeksti);
-        session.setAttribute("laakarinId", laakarinId);
-        session.setAttribute("ajanPvm", paivamaara);
-        session.setAttribute("aikaslottiId", aikaslottiId);
-        session.setAttribute("paivaId", paivaId);
-    }
-
-    public void asetaLaakarilleMaaratytVuorot(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        try {
-            laakarilleMaaratytTyovuorot(request);
-        } catch (Exception e) {
-            naytaVirheSivu("Lääkärin työvuorojen näyttäminen epäonnistui.", request, response);
+        List<String> paivamaarat = haePaivamaarat(request);
+        for (int i = 0; i < paivaIdt.size(); i++) {
+            Tyovuorot vuoro = new Tyovuorot();
+            vuoro.setPaivaId(paivaIdt.get(i));
+            vuoro.setAikaslottiId(aikaslottiIdt.get(i));
+            vuoro.setKayttajaId(laakarinId);
+            vuoro.setTyopaivamaara(muunnaTyopaivamaara(paivamaarat.get(i)));
+            vuoro.luoTyovuoro();
         }
     }
 }

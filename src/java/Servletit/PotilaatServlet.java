@@ -1,15 +1,13 @@
 package Servletit;
 
-import Mallit.Asiakas;
+import Mallit.Kayttaja;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.naming.NamingException;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -37,14 +35,12 @@ public class PotilaatServlet extends EmoServlet {
             kirjauduUlos(request, response);
         } else if (onkoKirjautunut(request, response)) {
             try {
-                List<Asiakas> asiakkaat = Asiakas.getAsiakkaat();
+                List<Kayttaja> asiakkaat = Kayttaja.getKayttajat(3);
                 request.setAttribute("asiakkaat", asiakkaat);
-            } catch (SQLException ex) {
-                Logger.getLogger(PotilaatServlet.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (NamingException ex) {
-                Logger.getLogger(PotilaatServlet.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (Exception e) {
+                naytaVirheSivu("Asiakkaiden hakeminen tietokannasta epäonnistui.", request, response);
             }
-            if (potilaanTiedotNapinPainallus(request)) {
+            if (napinPainallus("potilaanTiedot", request)) {
                 HttpSession session = request.getSession();
                 String asiakasId = request.getParameter("asiakasId");
                 session.setAttribute("asiakasId", asiakasId);
@@ -53,10 +49,6 @@ public class PotilaatServlet extends EmoServlet {
                 avaaSivunakyma(request, response, "tyotehtavat", "laakarinviikkoaikataulu", "potilaat", "web/potilaat.jsp");
             }
         }
-    }
-
-    public boolean potilaanTiedotNapinPainallus(HttpServletRequest request) {
-        return request.getParameter("potilaanTiedot") != null;
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

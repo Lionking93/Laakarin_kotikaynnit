@@ -9,7 +9,7 @@
 <%@taglib prefix="t" tagdir="/WEB-INF/tags"%>
 <!DOCTYPE html>
 <t:lisaaTieto minkaTiedot="Ajanvarauksen tiedot" ekaTieto="Lääkärin nimi" ekanTiedonArvo="${laakarinNimi}" 
-              tokaTieto="Varattavan ajan päivämäärä" tokanTiedonArvo="${ajanPvm}" kolmasTieto="Kellonaika"
+              tokaTieto="Varattavan ajan päivämäärä" tokanTiedonArvo="${paiva}, ${ajanPvm}" kolmasTieto="Kellonaika"
               kolmannenTiedonArvo="${laakarinAika}" tekstikentanNimi="oirekuvaus" tekstikentanSisalto="Kuvaile allaolevaan kenttään oireitasi.">    
     <div>
         <input class="btn btn-default" name="varaaAika" value="Varaa aika" type="submit" />

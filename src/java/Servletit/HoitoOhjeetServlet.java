@@ -1,9 +1,14 @@
 package Servletit;
 
+import Mallit.HoitoOhje;
+import Mallit.Kayttaja;
+import Mallit.Varaus;
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import javax.naming.NamingException;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -29,6 +34,22 @@ public class HoitoOhjeetServlet extends EmoServlet {
         if (kirjaudutaankoUlos(request)) {
             kirjauduUlos(request, response);
         } else if (onkoKirjautunut(request, response)) {
+            try {
+                if (HoitoOhje.haeHoitoOhjeetAsiakasIdlla(getKayttaja().getId()).isEmpty()) {
+                    request.setAttribute("hoitoOhjeenTila", "Sinulla ei ole hoito-ohjeita.");
+                }
+                List<HoitoOhje> hoitoOhjeet = HoitoOhje.haeHoitoOhjeetAsiakasIdlla(getKayttaja().getId());
+                List<Kayttaja> laakarit = new ArrayList<Kayttaja>();
+                for (HoitoOhje h : hoitoOhjeet) {
+                    Varaus v = Varaus.haeVarausIdlla(h.getVarausId());
+                    Kayttaja l = v.getLaakari();
+                    laakarit.add(l);
+                }
+                request.setAttribute("hoitoOhjeet", hoitoOhjeet);
+                request.setAttribute("laakarit", laakarit);
+            } catch (Exception e) {
+                naytaVirheSivu("Hoito-ohjeiden haku epäonnistui.", request, response);
+            }
             avaaSivunakyma(request, response, "omatvaraukset", "viikkoaikataulu", "hoito-ohjeet", "web/hoitoOhjeet.jsp");
         }
     }

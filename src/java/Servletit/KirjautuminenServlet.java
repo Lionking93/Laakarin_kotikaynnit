@@ -1,8 +1,6 @@
 package Servletit;
 
-import Mallit.Asiakas;
 import Mallit.Kayttaja;
-import Mallit.Laakari;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.logging.Level;
@@ -58,28 +56,29 @@ public class KirjautuminenServlet extends EmoServlet {
 
         /*Tunnistaa kirjautuuko käyttäjä asiakas-tunnuksilla vai lääkäritunnuksilla. Jos ei kumpikaan, mitään ei tapahdu.*/
         try {
-            if (Asiakas.etsiAsiakasTunnuksilla(username, password) != null) {
-                Kayttaja kayttaja = Asiakas.etsiAsiakasTunnuksilla(username, password);
+            if (Kayttaja.etsiKayttajaTunnuksilla(username, password) != null) {
+                Kayttaja kayttaja = Kayttaja.etsiKayttajaTunnuksilla(username, password);
                 if (kayttaja != null) {
                     session.setAttribute("kirjautunut", kayttaja);
-                    response.sendRedirect("omatvaraukset");
+                    if (kayttaja.getKayttoOikeus() == 3) {
+                        session.setAttribute("siirtyma", "0");
+                        response.sendRedirect("omatvaraukset");
+                    }
+                    if (kayttaja.getKayttoOikeus() == 2) {
+                        response.sendRedirect("tyotehtavat");
+                    } 
+                    if (kayttaja.getKayttoOikeus() == 1) {
+                        session.setAttribute("siirtyma", "0");
+                        response.sendRedirect("pomonsivu");
+                    }
                 }
-            } else if (Laakari.etsiLaakariTunnuksilla(username, password) != null) {
-                Kayttaja kayttaja = Laakari.etsiLaakariTunnuksilla(username, password);
-                if (kayttaja != null) {
-                    session.setAttribute("kirjautunut", kayttaja);
-                    response.sendRedirect("tyotehtavat");
-                }
-
             } else {
                 asetaVirhe("Antamasi käyttäjätunnus tai salasana on väärä.", request);
                 naytaSivu(request, response, "web/kirjautuminen.jsp");
             }
 
-        } catch (NamingException ex) {
-            Logger.getLogger(KirjautuminenServlet.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SQLException ex) {
-            Logger.getLogger(KirjautuminenServlet.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception e) {
+            naytaVirheSivu("Kirjautimisessa tapahtui virhe.", request, response);
         }
     }
 

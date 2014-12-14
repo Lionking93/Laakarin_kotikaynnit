@@ -17,7 +17,14 @@ import javax.naming.NamingException;
 public class HoitoOhje extends Potilastieto {
     
     public HoitoOhje(int id, int varattava_aika_id, int asiakas_id, Timestamp lisaysajankohta, String ohje) {
-        super(id, varattava_aika_id, asiakas_id, lisaysajankohta, ohje);
+        super(id, varattava_aika_id, lisaysajankohta, ohje);
+    }
+    
+    public HoitoOhje(ResultSet rs) throws SQLException {
+        this.id = rs.getInt("id");
+        this.varausId = rs.getInt("varaus_id");
+        this.lisaysajankohta = rs.getTimestamp("lisaysajankohta");
+        this.lisattavaTeksti = rs.getString("ohje");
     }
     
     public HoitoOhje() {}
@@ -25,52 +32,38 @@ public class HoitoOhje extends Potilastieto {
     public void lisaaKuvausKantaan() throws NamingException, SQLException {
         Yhteys tietokanta = new Yhteys();
         Connection yhteys = tietokanta.getYhteys();
-        String sql = "INSERT INTO Hoito_ohje(hoito_ohje_varattava_aika_id, hoito_ohje_asiakas_id, lisaysajankohta, ohje) VALUES(?, ?, ?, ?) RETURNING id";
+        String sql = "INSERT INTO Hoito_ohje(varaus_id, lisaysajankohta, ohje) VALUES(?, ?, ?) RETURNING id";
         suoritaLisays(yhteys, sql);
     }
     
     public static List<HoitoOhje> haeHoitoOhjeetAsiakasIdlla(int id) throws NamingException, SQLException {
         Yhteys tietokanta = new Yhteys();
         Connection yhteys = tietokanta.getYhteys();
-        String sql = "SELECT id, hoito_ohje_varattava_aika_id, hoito_ohje_asiakas_id, lisaysajankohta, ohje FROM Hoito_ohje WHERE Hoito_ohje_asiakas_id = ? ORDER BY hoito_ohje_varattava_aika_id asc";
+        String sql = "SELECT Hoito_ohje.id, Hoito_ohje.varaus_id, Hoito_ohje.lisaysajankohta, Hoito_ohje.ohje FROM Hoito_ohje, Varaus, Kayttaja WHERE Hoito_ohje.varaus_id = Varaus.id AND Varaus.asiakas_id = Kayttaja.id AND Kayttaja.id = ? ORDER BY Hoito_ohje.varaus_id asc";
         PreparedStatement kysely = yhteys.prepareStatement(sql);
         kysely.setInt(1, id);
         ResultSet rs = kysely.executeQuery();
         List<HoitoOhje> l = new ArrayList<HoitoOhje>();
         while (rs.next()) {
-            HoitoOhje p = new HoitoOhje();
-            p.setId(rs.getInt("id"));
-            p.setVarattavaAikaId(rs.getInt("hoito_ohje_varattava_aika_id"));
-            p.setAsiakasId(rs.getInt("hoito_ohje_asiakas_id"));
-            p.setLisaysajankohta(rs.getTimestamp("lisaysajankohta"));
-            p.setLisattavaTeksti(rs.getString("ohje"));
+            HoitoOhje p = new HoitoOhje(rs);
             l.add(p);
         }
-        try { rs.close(); } catch (Exception e) {}
-        try { kysely.close(); } catch (Exception e) {}
-        try { yhteys.close(); } catch (Exception e) {}
+        suljeResurssit(rs, kysely, yhteys);
         return l;
     }
     
-    public static HoitoOhje haeHoitoOhjeVarattavaAikaIdlla(int id) throws NamingException, SQLException {
+    public static HoitoOhje haeHoitoOhjeVarausIdlla(int id) throws NamingException, SQLException {
         Yhteys tietokanta = new Yhteys();
         Connection yhteys = tietokanta.getYhteys();
-        String sql = "SELECT id, hoito_ohje_varattava_aika_id, hoito_ohje_asiakas_id, lisaysajankohta, ohje FROM Hoito_ohje WHERE Hoito_ohje_varattava_aika_id = ? ORDER BY hoito_ohje_varattava_aika_id asc";
+        String sql = "SELECT * FROM Hoito_ohje WHERE Hoito_ohje.varaus_id = ? ORDER BY hoito_ohje.varaus_id asc";
         PreparedStatement kysely = yhteys.prepareStatement(sql);
         kysely.setInt(1, id);
         ResultSet rs = kysely.executeQuery();
         HoitoOhje p = null;
         if (rs.next()) {
-            p = new HoitoOhje();
-            p.setId(rs.getInt("id"));
-            p.setVarattavaAikaId(rs.getInt("hoito_ohje_varattava_aika_id"));
-            p.setAsiakasId(rs.getInt("hoito_ohje_asiakas_id"));
-            p.setLisaysajankohta(rs.getTimestamp("lisaysajankohta"));
-            p.setLisattavaTeksti(rs.getString("ohje"));
+            p = new HoitoOhje(rs);
         }
-        try { rs.close(); } catch (Exception e) {}
-        try { kysely.close(); } catch (Exception e) {}
-        try { yhteys.close(); } catch (Exception e) {}
+        suljeResurssit(rs, kysely, yhteys);
         return p;
     }
     

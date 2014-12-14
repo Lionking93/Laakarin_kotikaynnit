@@ -18,16 +18,14 @@ import javax.naming.NamingException;
 public class Potilastieto {
 
     protected int id;
-    protected int varattavaAikaId;
-    protected int asiakas_id;
+    protected int varausId;
     protected Timestamp lisaysajankohta;
     protected String lisattavaTeksti;
     protected Map<String, String> virheet = new HashMap<String, String>();
 
-    public Potilastieto(int id, int varattava_aika_id, int asiakas_id, Timestamp lisaysajankohta, String lisattavaTeksti) {
+    public Potilastieto(int id, int varattava_aika_id, Timestamp lisaysajankohta, String lisattavaTeksti) {
         this.id = id;
-        this.varattavaAikaId = varattava_aika_id;
-        this.asiakas_id = asiakas_id;
+        this.varausId = varattava_aika_id;
         this.lisaysajankohta = lisaysajankohta;
         this.lisattavaTeksti = lisattavaTeksti;
     }
@@ -39,12 +37,8 @@ public class Potilastieto {
         return this.id;
     }
     
-    public int getVarattavaAikaId() {
-        return this.varattavaAikaId;
-    }
-    
-    public int getAsiakasId() {
-        return this.asiakas_id;
+    public int getVarausId() {
+        return this.varausId;
     }
 
     public Timestamp getLisaysajankohta() {
@@ -59,12 +53,8 @@ public class Potilastieto {
         this.id = uusiId;
     }
     
-    public void setVarattavaAikaId(int uusiId) {
-        this.varattavaAikaId = uusiId;
-    }
-    
-    public void setAsiakasId(int uusiId) {
-        this.asiakas_id = uusiId;
+    public void setVarausId(int uusiId) {
+        this.varausId = uusiId;
     }
 
     public void setLisaysajankohta(Timestamp uusiLisaysajankohta) {
@@ -85,10 +75,9 @@ public class Potilastieto {
 
     public void suoritaLisays(Connection yhteys, String sql) throws SQLException {
         PreparedStatement kysely = yhteys.prepareStatement(sql);
-        kysely.setInt(1, this.getVarattavaAikaId());
-        kysely.setInt(2, this.getAsiakasId());
-        kysely.setTimestamp(3, this.getLisaysajankohta());
-        kysely.setString(4, this.getLisattavaTeksti());
+        kysely.setInt(1, this.getVarausId());
+        kysely.setTimestamp(2, this.getLisaysajankohta());
+        kysely.setString(3, this.getLisattavaTeksti());
 
         ResultSet rs = kysely.executeQuery();
         
@@ -112,5 +101,11 @@ public class Potilastieto {
 
     public boolean onkoKelvollinen() {
         return virheet.isEmpty();
+    }
+    
+    protected static void suljeResurssit(ResultSet rs, PreparedStatement kysely, Connection yhteys) {
+        try { rs.close(); } catch (Exception e) {}
+        try { kysely.close(); } catch (Exception e) {}
+        try { yhteys.close(); } catch (Exception e) {}
     }
 }

@@ -2,10 +2,11 @@ package Servletit;
 
 import Mallit.Kayttaja;
 import Mallit.Oirekuvaus;
-import Mallit.VarattavaAika;
+import Mallit.Varaus;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -39,25 +40,35 @@ public class OmatVarauksetServlet extends EmoServlet {
             kirjauduUlos(request, response);
         } else if (onkoKirjautunut(request, response)) {
             try {
-                if (VarattavaAika.haeAjatAsiakasIdlla(getKayttaja().getId()).isEmpty()) {
+                if (Varaus.haeAjatAsiakasIdlla(getKayttaja().getId()).isEmpty()) {
                     request.setAttribute("varauksenTila", "Sinulla ei ole ajanvarauksia.");
                 } else {
-                    if (ajanPerumisNapinPainallus(request)) {
-                        Kayttaja kayttaja = getKayttaja();
+                    if (napinPainallus("peruaika", request)) {
                         int id = haePeruttavanAjanId(request);
-                        VarattavaAika.peruAika(kayttaja, id);
+                        Varaus.peruAika(id);
                         Oirekuvaus.poistaOirekuvaus(id);
                         request.setAttribute("varauksenTila", "Varaus peruttu onnistuneesti.");
                     }
-                    List<VarattavaAika> ajat = VarattavaAika.haeAjatAsiakasIdlla(getKayttaja().getId());
-                    haeVaraustieto(request);
-                    request.setAttribute("varaukset", ajat);
+                    try {
+                        List<Varaus> ajat = Varaus.haeAjatAsiakasIdlla(getKayttaja().getId());
+                        List<Oirekuvaus> oirekuvaukset = new ArrayList<Oirekuvaus>();
+                        for (Varaus v : ajat) {
+                            Oirekuvaus o = Oirekuvaus.haeOirekuvausVarausIdlla(v.getId());
+                            oirekuvaukset.add(o);
+                        }
+                        haeVaraustieto(request);
+                        muunnaPaivamaaratSuomalaisiksi(request, ajat);
+                        request.setAttribute("varaukset", ajat);
+                        request.setAttribute("oirekuvaukset", oirekuvaukset);
+                    } catch (Exception e) {
+                        naytaVirheSivu("Varausten hakeminen epäonnistui.", request, response);
+                    }
                 }
             } catch (NamingException e) {
 
             } catch (SQLException e) {
             }
-            avaaSivunakyma(request, response,"omatvaraukset", "viikkoaikataulu", "hoito-ohjeet", "web/omatVaraukset.jsp");
+            avaaSivunakyma(request, response, "omatvaraukset", "viikkoaikataulu", "hoito-ohjeet", "web/omatVaraukset.jsp");
         }
     }
 
@@ -123,9 +134,12 @@ public class OmatVarauksetServlet extends EmoServlet {
             }
         }
     }
-
-    public boolean ajanPerumisNapinPainallus(HttpServletRequest request) {
-        return request.getParameter("peruaika") != null;
+    
+    public void muunnaPaivamaaratSuomalaisiksi(HttpServletRequest request, List<Varaus> ajat) {
+        List<String> paivamaarat = new ArrayList<String>();
+        for (Varaus v : ajat) {
+            paivamaarat.add(Varaus.muotoilePaivamaara(v.getLisaysajankohta()));
+        }
+        request.setAttribute("paivamaarat", paivamaarat);
     }
-
 }

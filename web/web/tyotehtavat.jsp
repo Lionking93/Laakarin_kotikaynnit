@@ -19,7 +19,7 @@
             <c:forEach var="tyo" items="${tyot}" varStatus="monesko">     
                     <tr>
                         <td><c:out value="${tyo.asiakas.nimi}" /></td>
-                        <td><c:out value="${tyo.viikonpaiva}, ${tyo.aika}" /></td>
+                        <td><c:out value="${tyo.paiva.paiva}, ${tyo.aikaslotti.aikaslotti}" /></td>
                         <td><c:out value="${oireet[monesko.index].lisattavaTeksti}" /></td>
                         <td>
                             <form>

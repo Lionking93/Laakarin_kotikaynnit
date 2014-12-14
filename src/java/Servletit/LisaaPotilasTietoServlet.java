@@ -1,23 +1,23 @@
 package Servletit;
 
-import Mallit.VarattavaAika;
+import Mallit.Kayttaja;
+import Mallit.Potilastieto;
+import Mallit.Varaus;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.naming.NamingException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  *
  * @author leo
  */
-public class LaakariServlet extends EmoServlet {
+public class LisaaPotilasTietoServlet extends EmoServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -28,36 +28,9 @@ public class LaakariServlet extends EmoServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
-    @Override
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        
-        try {
-            List<String> paivat = VarattavaAika.haeViikonPaivat();
-
-            request.setAttribute("paivat", paivat);
-        } catch (NamingException ex) {
-            Logger.getLogger(LaakariServlet.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SQLException ex) {
-            Logger.getLogger(LaakariServlet.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        if (request.getParameter("kirjauduUlos") != null) {
-            kirjauduUlos(request, response);
-        } else if (onkoKirjautunut(request, response)) {
-            String kayttajanNimi = getKayttaja().getNimi();
-            request.setAttribute("kayttajanNimi", kayttajanNimi);
-            if (request.getParameter("ekaTab") != null) {
-                naytaSivu(request, response, "web/tyotehtavat.jsp");
-            } else if (request.getParameter("tokaTab") != null) {
-                naytaSivu(request, response, "laakarinviikkoaikataulu");
-            } else if (request.getParameter("kolmasTab") != null) {
-                naytaSivu(request, response, "web/potilaat.jsp");
-            } else {
-                naytaSivu(request, response, "web/tyotehtavat.jsp");
-            }
-        }
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
@@ -98,5 +71,38 @@ public class LaakariServlet extends EmoServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
+    
+     protected Kayttaja haeAsiakkaanTiedot(HttpServletRequest request) throws NamingException, SQLException {
+        HttpSession session = request.getSession();
+        String asiakasIdTeksti = (String) session.getAttribute("asiakasId");
+        int asiakasId = Integer.parseInt(asiakasIdTeksti);
+        Kayttaja a = Kayttaja.haeKayttajaIdlla(asiakasId);
+        return a;
+    }
 
+    protected Varaus haeVarauksenTiedot(HttpServletRequest request) throws SQLException, NamingException {
+        HttpSession session = request.getSession();
+        String varausIdTeksti = (String) session.getAttribute("varausId");
+        int varausId = Integer.parseInt(varausIdTeksti);
+        Varaus v = Varaus.haeVarausIdlla(varausId);
+        return v;
+    }
+
+    protected void asetaAsiakkaanTiedot(HttpServletRequest request) throws NamingException, SQLException {
+        Kayttaja a = haeAsiakkaanTiedot(request);
+        request.setAttribute("asiakkaanNimi", a.getNimi());
+        request.setAttribute("asiakkaanHetu", a.getHenkilotunnus());
+        request.setAttribute("asiakkaanOsoite", a.getOsoite());
+    }
+
+    protected void lahetaTietoOnnistuneestaLisayksesta(HttpServletRequest request, String lisays) {
+        HttpSession session = request.getSession();
+        session.setAttribute("onnistunutLisays", lisays);
+    }
+    
+    protected void lisaaPotilastiedonAttribuutit(HttpServletRequest request, Potilastieto p) throws SQLException, NamingException {
+        p.setVarausId(haeVarauksenTiedot(request).getId());
+        p.setLisaysajankohta(luoLisaysajankohta());
+        p.setLisattavaTeksti(request.getParameter("potilastieto"));
+    }
 }

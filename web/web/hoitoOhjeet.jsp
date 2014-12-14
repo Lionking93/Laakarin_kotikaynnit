@@ -6,8 +6,9 @@
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="t" tagdir="/WEB-INF/tags"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
-<t:pohja kenenTili="Asiakas" aktiivinenKolmasTab="active" ekaTab="Omat varaukset" tokaTab="Viikkoaikataulu" kolmasTab="Hoito-ohjeet">
+<t:pohja kenenTili="Asiakas" aktiivinenKolmasTab="active" ekaTab="Omat varaukset" tokaTab="Valitse lääkäri" kolmasTab="Hoito-ohjeet">
     <div class="tab-pane active">
         <table class="table table-striped">
             <tr>
@@ -15,16 +16,16 @@
                 <th>Lisäysaika</th>
                 <th>Hoito-ohje</th>
             </tr>
-            <tr>
-                <td>Pentti Virtanen</td>
-                <td>5.11.2014, 15:03</td>
-                <td>Riittävästi lepoa ja kevyitä ruokia</td>
-            </tr>
-            <tr>
-                <td>Pentti Virtanen</td>
-                <td>8.11.2014, 16:15</td>
-                <td>2*400 mg Buranaa</td>
-            </tr>
+            <c:forEach var="hoitoOhje" items="${hoitoOhjeet}" varStatus="moneskoHoitoOhje">
+                <tr>
+                    <td><c:out value="${laakarit[moneskoHoitoOhje.index].nimi}" /></td>
+                    <td><c:out value="${hoitoOhje.lisaysajankohta}" /></td>
+                    <td><c:out value="${hoitoOhje.lisattavaTeksti}" /></td>
+                </tr>
+            </c:forEach>
         </table>
+        <c:if test="${hoitoOhjeenTila != null}">
+            <div class="alert alert-info col-xs-3"><c:out value="${hoitoOhjeenTila}" /></div>
+        </c:if>
     </div>
 </t:pohja>

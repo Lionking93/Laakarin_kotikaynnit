@@ -7,35 +7,20 @@
 <%@tag description="dropdown-valikko" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%-- The list of normal or fragment attributes can be specified here: --%>
-<%@attribute name="laakarinNimi"%>
-<%@attribute name="laakarinAika" %>
-<%@attribute name="ajanId" %>
 
 <%-- any content can be specified here e.g.: --%>
-<form>
-    <div class="dropdown dropdown-vapaa">
-        <div class="dropdown-toggle" id="dropdownvalikko"
-             data-toggle="dropdown">${laakarinNimi}
-        </div>
-        <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownvalikko">
-            <li role="presentation">
-                <table>
-                    <tr>
-                        <th>Hoitava lääkäri: </th>
-                        <td> <c:out value="${laakarinNimi}" /></td>
-                    </tr>
-                    <tr>
-                        <th>Kotikäyntiaika: </th>
-                        <td> <c:out value="${laakarinAika}" /></td>
-                    </tr>
-                </table>
-            </li>
-            <li role="presentation">
-                <a role="menuitem">
-                    <button type="submit">Varaa aika</button>
-                    <input class="hidden" name="ajanvaraus" value="${ajanId}" />
-                </a>
-            </li>
-        </ul>
+<div class="dropdown lisattavalaakari">
+    <div class="dropdown-toggle" id="dropdownvalikko"
+         data-toggle="dropdown">Lisää lääkäri
     </div>
-</form>
+    <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownvalikko">
+        <c:forEach var="laakari" items="${laakarit}">
+            <li class="lisattavalaakari" role="presentation">
+                <form>
+                    <input type="hidden" name="lisattavaLaakari" value="${laakari.id}" />
+                    <input type="submit" name="laakarinNimi" value="${laakari.nimi}">
+                </form>
+            </li>
+        </c:forEach>
+    </ul>
+</div>
