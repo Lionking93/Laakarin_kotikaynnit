@@ -16,7 +16,7 @@ import javax.naming.NamingException;
  */
 public class Potilasraportti extends Potilastieto {
 
-    public Potilasraportti(int id, int varattava_aika_id, int asiakas_id, Timestamp lisaysajankohta, String raportti) {
+    public Potilasraportti(int id, int varattava_aika_id, Timestamp lisaysajankohta, String raportti) {
         super(id, varattava_aika_id, lisaysajankohta, raportti);
     }
     
@@ -32,7 +32,7 @@ public class Potilasraportti extends Potilastieto {
     public static List<Potilasraportti> haePotilasraportitAsiakasIdlla(int id) throws NamingException, SQLException {
         Yhteys tietokanta = new Yhteys();
         Connection yhteys = tietokanta.getYhteys();
-        String sql = "SELECT Potilasraportti.id, Potilasraportti.varaus_id, Potilasraportti.lisaysajankohta, Potilasraportt.raportti FROM Potilasraportti, Varaus, Kayttaja WHERE Potilasraportti.varaus_id = Varaus.id AND Varaus.asiakas_id = Kayttaja.id AND Kayttaja.id = ?";
+        String sql = "SELECT Potilasraportti.id, Potilasraportti.varaus_id, Potilasraportti.lisaysajankohta, Potilasraportti.raportti FROM Potilasraportti, Varaus, Kayttaja WHERE Potilasraportti.varaus_id = Varaus.id AND Varaus.asiakas_id = Kayttaja.id AND Kayttaja.id = ?";
         PreparedStatement kysely = yhteys.prepareStatement(sql);
         kysely.setInt(1, id);
         ResultSet rs = kysely.executeQuery();

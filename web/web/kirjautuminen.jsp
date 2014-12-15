@@ -40,7 +40,10 @@
             </div>
             <div class="form-group">
                 <div class="col-sm-offset-2 col-sm-2">
-                    <button type="submit">Kirjaudu</button>
+                    <button class="btn btn-primary" type="submit">Kirjaudu</button>
+                </div>
+                <div class="col-sm-2">
+                    <input class="btn btn-primary" name="luoTunnus" type="submit" value="Luo uusi tunnus" />
                 </div>
             </div>
         </form>

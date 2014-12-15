@@ -19,7 +19,7 @@
             <c:forEach var="hoitoOhje" items="${hoitoOhjeet}" varStatus="moneskoHoitoOhje">
                 <tr>
                     <td><c:out value="${laakarit[moneskoHoitoOhje.index].nimi}" /></td>
-                    <td><c:out value="${hoitoOhje.lisaysajankohta}" /></td>
+                    <td><c:out value="${paivamaarat[moneskoHoitoOhje.index]}" /></td>
                     <td><c:out value="${hoitoOhje.lisattavaTeksti}" /></td>
                 </tr>
             </c:forEach>

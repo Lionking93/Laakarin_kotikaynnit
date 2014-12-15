@@ -19,7 +19,7 @@
                     <td>
                         <form>
                             <input class="hidden" name="asiakasId" value="${asiakas.id}" />
-                            <input class="btn btn-default" type="submit" name="potilaanTiedot" value="Avaa potilaan tiedot" />
+                            <input class="btn btn-primary" type="submit" name="potilaanTiedot" value="Avaa potilaan tiedot" />
                         </form>
                     </td>
                 </tr>

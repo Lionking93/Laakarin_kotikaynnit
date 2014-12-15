@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 /**
- *
+ *Servlelt, joka hoitaa käyttäjän kirjautumisen sekä mahdollistaa siirtymisen oman käyttäjätilin luontiin
  * @author leo
  */
 public class KirjautuminenServlet extends EmoServlet {
@@ -30,6 +30,11 @@ public class KirjautuminenServlet extends EmoServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
+        
+        if (request.getParameter("luoTunnus") != null) {
+            response.sendRedirect("luouusitili");
+            return;
+        }
 
         String password = request.getParameter("password");
         String username = request.getParameter("username");
@@ -53,7 +58,7 @@ public class KirjautuminenServlet extends EmoServlet {
             naytaSivu(request, response, "web/kirjautuminen.jsp");
             return;
         }
-
+       
         /*Tunnistaa kirjautuuko käyttäjä asiakas-tunnuksilla vai lääkäritunnuksilla. Jos ei kumpikaan, mitään ei tapahdu.*/
         try {
             if (Kayttaja.etsiKayttajaTunnuksilla(username, password) != null) {
@@ -78,7 +83,7 @@ public class KirjautuminenServlet extends EmoServlet {
             }
 
         } catch (Exception e) {
-            naytaVirheSivu("Kirjautimisessa tapahtui virhe.", request, response);
+            naytaVirheSivu("Kirjautumisessa tapahtui virhe.", request, response);
         }
     }
 

@@ -18,7 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 /**
- *
+ *Hakee Asiakas-käyttäjän varaamat lääkärinajat
  * @author leo
  */
 public class OmatVarauksetServlet extends EmoServlet {
@@ -110,19 +110,19 @@ public class OmatVarauksetServlet extends EmoServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
-
+    //Hakee istuntoon tallennetun tiedon lisätystä varauksesta
     public int haeAjanvarausId(HttpServletRequest request) {
         HttpSession session = request.getSession();
         int ajanvarausId;
         ajanvarausId = (Integer) session.getAttribute("ajanvarausId");
         return ajanvarausId;
     }
-
+    //Hakee omatVaraukset.jsp-sivulta peruttavan ajan id:n
     public int haePeruttavanAjanId(HttpServletRequest request) {
         int peruttavaAika = Integer.parseInt(request.getParameter("peruaika"));
         return peruttavaAika;
     }
-
+    //Hakee istuntoon tallennetun tiedon varauksen onnistumisesta
     public void haeVaraustieto(HttpServletRequest request) {
         HttpSession session = request.getSession();
         String varaustieto;
@@ -133,13 +133,5 @@ public class OmatVarauksetServlet extends EmoServlet {
                 request.setAttribute("varauksenTila", varaustieto);
             }
         }
-    }
-    
-    public void muunnaPaivamaaratSuomalaisiksi(HttpServletRequest request, List<Varaus> ajat) {
-        List<String> paivamaarat = new ArrayList<String>();
-        for (Varaus v : ajat) {
-            paivamaarat.add(Varaus.muotoilePaivamaara(v.getLisaysajankohta()));
-        }
-        request.setAttribute("paivamaarat", paivamaarat);
     }
 }

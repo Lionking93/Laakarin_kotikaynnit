@@ -4,6 +4,7 @@ import Mallit.Kayttaja;
 import Mallit.HoitoOhje;
 import Mallit.Oirekuvaus;
 import Mallit.Potilasraportti;
+import Mallit.Varaus;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
@@ -18,7 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 /**
- *
+ *Näyttää yksittäisen asiakkaan tietoja, kuten lisätyt potilasraportit, hoito-ohjeet ja oireet
  * @author leo
  */
 public class PotilaanTiedotServlet extends EmoServlet {
@@ -107,22 +108,22 @@ public class PotilaanTiedotServlet extends EmoServlet {
     }// </editor-fold>
 
     public void asetaAsiakkaanTiedot(HttpServletRequest request) throws NamingException, SQLException {
-        Kayttaja a = haeAsiakkaanTiedot(request);
+        Kayttaja a = haeAsiakkaanTiedotAsiakasIdlla(request);
         request.setAttribute("asiakkaanNimi", a.getNimi());
         request.setAttribute("asiakkaanHetu", a.getHenkilotunnus());
         request.setAttribute("asiakkaanOsoite", a.getOsoite());
     }
-
-    public Kayttaja haeAsiakkaanTiedot(HttpServletRequest request) throws NamingException, SQLException {
+    
+    public Kayttaja haeAsiakkaanTiedotAsiakasIdlla(HttpServletRequest request) throws NamingException, SQLException {
         HttpSession session = request.getSession();
         String asiakasIdTeksti = (String) session.getAttribute("asiakasId");
         int asiakasId = Integer.parseInt(asiakasIdTeksti);
-        Kayttaja a = Kayttaja.haeKayttajaIdlla(asiakasId);
-        return a;
+        Kayttaja k = Kayttaja.haeKayttajaIdlla(asiakasId);
+        return k;
     }
-
+    
     public void lisaaPotilasraportit(HttpServletRequest request, HttpServletResponse response) throws NamingException, SQLException, ServletException, IOException {
-        Kayttaja a = haeAsiakkaanTiedot(request);
+        Kayttaja a = haeAsiakkaanTiedotAsiakasIdlla(request);
         try {
             List<Potilasraportti> l = Potilasraportti.haePotilasraportitAsiakasIdlla(a.getId());
             List<String> pvm = new ArrayList<String>();
@@ -139,7 +140,7 @@ public class PotilaanTiedotServlet extends EmoServlet {
     }
 
     public void lisaaHoitoOhjeet(HttpServletRequest request, HttpServletResponse response) throws NamingException, SQLException, ServletException, IOException {
-        Kayttaja a = haeAsiakkaanTiedot(request);
+        Kayttaja a = haeAsiakkaanTiedotAsiakasIdlla(request);
         try {
             List<HoitoOhje> h = new ArrayList<HoitoOhje>();
             List<Oirekuvaus> o = Oirekuvaus.haeOirekuvauksetAsiakasIdlla(a.getId());
@@ -161,7 +162,7 @@ public class PotilaanTiedotServlet extends EmoServlet {
     }
 
     public void lisaaOirekuvaukset(HttpServletRequest request, HttpServletResponse response) throws NamingException, SQLException, ServletException, IOException {
-        Kayttaja a = haeAsiakkaanTiedot(request);
+        Kayttaja a = haeAsiakkaanTiedotAsiakasIdlla(request);
         try {
             List<Oirekuvaus> o = Oirekuvaus.haeOirekuvauksetAsiakasIdlla(a.getId());
             List<String> pvm = new ArrayList<String>();
@@ -177,10 +178,12 @@ public class PotilaanTiedotServlet extends EmoServlet {
         }
     }
 
-    public void lahetaTyhjanHoitoOhjeenTiedotLisaaPotilasRaporttiServletille(HttpServletRequest request) {
+    public void lahetaTyhjanHoitoOhjeenTiedotLisaaPotilasRaporttiServletille(HttpServletRequest request) throws SQLException, NamingException {
         HttpSession session = request.getSession();
-        String asiakasId = request.getParameter("lisaaHoitoOhje");
         String varauksenId = request.getParameter("hoitoOhjeenVarattavaAikaId");
+        Varaus v = Varaus.haeVarausIdlla(Integer.parseInt(varauksenId));
+        Kayttaja k = Kayttaja.haeKayttajaIdlla(v.getAsiakas().getId());
+        String asiakasId = "" + k.getId();
         session.setAttribute("asiakasId", asiakasId);
         session.setAttribute("varausId", varauksenId);
     }

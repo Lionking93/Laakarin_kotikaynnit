@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 /**
- *
+ *Näyttää lääkäri-käyttäjän suoritettavat kotikäynnit
  * @author leo
  */
 public class TyotehtavatServlet extends EmoServlet {
@@ -41,13 +41,13 @@ public class TyotehtavatServlet extends EmoServlet {
                     avaaSivunakyma(request, response, "tyotehtavat", "laakarinviikkoaikataulu", "potilaat", "web/tyotehtavat.jsp");
                 } else {
                     if (napinPainallus("kuittaus", request)) {
-                        int varauksenId = Integer.parseInt((request.getParameter("varauksenId")));
-                        Varaus.peruAika(varauksenId);
+                        Varaus.varausSuoritettu(Integer.parseInt(request.getParameter("kuittaus")));
                         lahetaTyotehtavanTiedotLisaaPotilasRaporttiServletille(request);
                         response.sendRedirect("lisaapotilasraportti");
                     } else {
                         List<Varaus> tyot = Varaus.haeAjatLaakariIdlla(getKayttaja().getId());
                         request.setAttribute("tyot", tyot);
+                        muunnaPaivamaaratSuomalaisiksi(request, tyot);
                         List<Oirekuvaus> l = new ArrayList<Oirekuvaus>();
                         for (Varaus tyot1 : tyot) {
                             Oirekuvaus oire = Oirekuvaus.haeOirekuvausVarausIdlla(tyot1.getId());
@@ -104,9 +104,7 @@ public class TyotehtavatServlet extends EmoServlet {
 
     public void lahetaTyotehtavanTiedotLisaaPotilasRaporttiServletille(HttpServletRequest request) {
         HttpSession session = request.getSession();
-        String asiakasId = request.getParameter("kuittaus");
-        String varauksenId = request.getParameter("varauksenId");
-        session.setAttribute("asiakasId", asiakasId);
-        session.setAttribute("varausId", varauksenId);
+        String varausId = request.getParameter("kuittaus");
+        session.setAttribute("varauksenId", varausId);
     }
 }

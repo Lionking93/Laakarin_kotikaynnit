@@ -38,7 +38,7 @@
                     </table>
                 </div>
                 <div class="col-xs-2" id="kirjautuminen">
-                    <input class="btn btn-default" type="submit" name="etusivulle" value="Palaa etusivulle" />
+                    <input class="btn btn-primary" type="submit" name="etusivulle" value="Palaa etusivulle" />
                 </div>
             </div>
             <div class="tabbable">

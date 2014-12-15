@@ -19,7 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 /**
- *
+ *Yliluokka kahdelle sovelluksen kalenteri-servletille eli ViikkoaikatauluServletille ja PomoServletille
  * @author leo
  */
 public class AikatauluServlet extends EmoServlet {
@@ -77,7 +77,7 @@ public class AikatauluServlet extends EmoServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
-
+    //Hakee päivät Maanantaista perjantaihin tietokannasta
     protected void lataaPaivat(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
             List<Paiva> paivat = Paiva.haePaivat();
@@ -86,13 +86,13 @@ public class AikatauluServlet extends EmoServlet {
             naytaVirheSivu("Päivien haku tietokannasta epäonnistui.", request, response);
         }
     }
-
+    //Metodi, joka kokoaa yhteen pienempiä metodeja, joilla asetetaan sivulla näkyviä tietoja
     protected void asetaSivunTiedot(HttpServletRequest request, HttpServletResponse response) throws ServletException, NamingException, SQLException, IOException {
         asetaSivunKayttajanNimi(request);
         asetaLaakarinNimi(request);
         lataaResurssit(request, response);
     }
-
+    //Metodi, joka liikuttaa kalenteria joko viikolla eteenpäin tai viikolla taaksepäin
     protected void siirraKalenteria(HttpServletRequest request, String nappain) {
         HttpSession session = request.getSession();
         int siirtyma = Integer.parseInt((String) session.getAttribute("siirtyma"));
@@ -101,7 +101,7 @@ public class AikatauluServlet extends EmoServlet {
         String uusiSiirtyma = "" + uudenSiirtymanArvo;
         session.setAttribute("siirtyma", uusiSiirtyma);
     }
-
+    //Lataa lääkärit tietokannasta
     protected void lataaLaakarit(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
             List<Kayttaja> laakarit = Kayttaja.getKayttajat(2);
@@ -110,7 +110,7 @@ public class AikatauluServlet extends EmoServlet {
             naytaVirheSivu("Lääkäreiden haku tietokannasta epäonnistui.", request, response);
         }
     }
-
+    //Lataa aikaslotit eli vastaanottoajat esim. 08:00-08:45 tietokannasta
     protected void lataaAikaslotit(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
             List<Aikaslotti> ajat = Aikaslotti.haeAikaslotit();
@@ -119,7 +119,7 @@ public class AikatauluServlet extends EmoServlet {
             naytaVirheSivu("Aikojen hakeminen tietokannasta epäonnistui.", request, response);
         }
     }
-
+    //Lataa tämänhetkisen viikon päivämäärät Maanantaista Perjantaihin
     protected void lataaPaivamaarat(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
             List<String> paivamaarat = haeNykyisenViikonPaivamaarat(request);
@@ -134,14 +134,14 @@ public class AikatauluServlet extends EmoServlet {
             naytaVirheSivu("Viikon päivämäärien haku epäonnistui.", request, response);
         }
     }
-
+    //Kokoaa pienempiä metodeja
     protected void lataaResurssit(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         lataaPaivat(request, response);
         lataaLaakarit(request, response);
         lataaAikaslotit(request, response);
         lataaPaivamaarat(request, response);
     }
-
+    //Metodi, joka hakee lääkärille määrätyt työvuorot tietokanna työvuorot-taulusta
     protected void laakarilleMaaratytTyovuorot(HttpServletRequest request) throws NamingException, SQLException {
         HttpSession session = request.getSession();
         int laakarinId = Integer.parseInt((String) session.getAttribute("laakarinId"));
@@ -149,14 +149,14 @@ public class AikatauluServlet extends EmoServlet {
             request.setAttribute("maaratytVuorot", Tyovuorot.haeTyovuorotLaakariIdlla(laakarinId));
         }
     }
-
+    //Asettaa lääkärin nimen jsp-sivulle
     protected void asetaLaakarinNimi(HttpServletRequest request) throws NamingException, SQLException {
         HttpSession session = request.getSession();
         int laakarinId = Integer.parseInt((String) session.getAttribute("laakarinId"));
         Kayttaja l = Kayttaja.haeKayttajaIdlla(laakarinId);
         request.setAttribute("laakari", l);
     }
-
+    //Näyttää toisen sivun kahdesta saman servletin hallitsemasta sivusta
     protected void naytaTokaTab(HttpServletRequest request, HttpServletResponse response, String sivu) throws ServletException, IOException {
         try {
             laakarilleMaaratytTyovuorot(request);
@@ -165,7 +165,7 @@ public class AikatauluServlet extends EmoServlet {
         }
         naytaSivu(request, response, sivu);
     }
-    
+    //Hakee pomo-käyttäjän pomonTokatab-jsp-sivulle syöttämiä aikatietoja, päivän nimiä ja varauksen ajankohtia
     protected List<Integer> haePaivaTietoja(HttpServletRequest request, int kirjaimenSijainti) {
         String[] tyovuorot = request.getParameterValues("lisattyAika");
         List<Integer> haettavatIdt = new ArrayList<Integer>();
@@ -175,7 +175,7 @@ public class AikatauluServlet extends EmoServlet {
         }
         return haettavatIdt;
     }
-
+    //Hakee pomo-käyttäjän pomonTokatab-jsp-sivulle syöttämiä päivämäärätietoja
     protected List<String> haePaivamaarat(HttpServletRequest request) {
         String[] tyovuorot = request.getParameterValues("lisattyAika");
         List<String> paivamaarat = new ArrayList<String>();

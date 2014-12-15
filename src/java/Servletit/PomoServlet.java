@@ -21,7 +21,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 /**
- *
+ *Servlet, joka vastaa pomo-käyttäjän toiminnoista eli pomonEkatab ja pomonTokatab jsp-sivuista. Näillä sivuilla pomo pystyy lisäämään
+ * palkollisille lääkäreilleen työvuoroja
  * @author leo
  */
 public class PomoServlet extends AikatauluServlet {
@@ -68,7 +69,7 @@ public class PomoServlet extends AikatauluServlet {
                     naytaVirheSivu("Aikataulussa eteenpäin siirtyminen epäonnistui,", request, response);
                 }
             } else if (napinPainallus("lisaaTyovuorot", request)) {
-                if (request.getParameterValues("lisattyTyovuoro") != null) {
+                if (request.getParameterValues("lisattyAika") != null) {
                     try {
                         luoTyovuorot(request);
                         onnistunutLisays("Työvuorot lisätty onnistuneesti!", request);
@@ -136,7 +137,7 @@ public class PomoServlet extends AikatauluServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
-
+    //Luo pomon kalenteriin suorittamien valintojen mukaan lääkäreille työvuoroja
     public void luoTyovuorot(HttpServletRequest request) throws ParseException, NamingException, SQLException {
         List<Integer> paivaIdt = haePaivaTietoja(request, 0);
         List<Integer> aikaslottiIdt = haePaivaTietoja(request, 3);

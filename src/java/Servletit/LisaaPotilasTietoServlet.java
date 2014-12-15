@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 /**
- *
+ *Yliluokka LisääHoitoOhje-servletille sekä LisääPotilasRaportti-servletille
  * @author leo
  */
 public class LisaaPotilasTietoServlet extends EmoServlet {
@@ -74,20 +74,21 @@ public class LisaaPotilasTietoServlet extends EmoServlet {
     
      protected Kayttaja haeAsiakkaanTiedot(HttpServletRequest request) throws NamingException, SQLException {
         HttpSession session = request.getSession();
-        String asiakasIdTeksti = (String) session.getAttribute("asiakasId");
-        int asiakasId = Integer.parseInt(asiakasIdTeksti);
-        Kayttaja a = Kayttaja.haeKayttajaIdlla(asiakasId);
+        String varausIdTeksti = (String)session.getAttribute("varauksenId");
+        int varausId = Integer.parseInt(varausIdTeksti);
+        Varaus v = Varaus.haeVarausIdlla(varausId);
+        Kayttaja a = Kayttaja.haeKayttajaIdlla(v.getAsiakas().getId());
         return a;
     }
 
     protected Varaus haeVarauksenTiedot(HttpServletRequest request) throws SQLException, NamingException {
         HttpSession session = request.getSession();
-        String varausIdTeksti = (String) session.getAttribute("varausId");
+        String varausIdTeksti = (String) session.getAttribute("varauksenId");
         int varausId = Integer.parseInt(varausIdTeksti);
         Varaus v = Varaus.haeVarausIdlla(varausId);
         return v;
     }
-
+    //Asettaa asiakkaan tiedot jsp-sivulle, jossa asiakkaalle lisätään hoito-ohjetta tai potilasraporttia
     protected void asetaAsiakkaanTiedot(HttpServletRequest request) throws NamingException, SQLException {
         Kayttaja a = haeAsiakkaanTiedot(request);
         request.setAttribute("asiakkaanNimi", a.getNimi());
@@ -99,7 +100,7 @@ public class LisaaPotilasTietoServlet extends EmoServlet {
         HttpSession session = request.getSession();
         session.setAttribute("onnistunutLisays", lisays);
     }
-    
+    //Valmistelee potilasraportin tai hoito-ohjeen lisäystä varten
     protected void lisaaPotilastiedonAttribuutit(HttpServletRequest request, Potilastieto p) throws SQLException, NamingException {
         p.setVarausId(haeVarauksenTiedot(request).getId());
         p.setLisaysajankohta(luoLisaysajankohta());

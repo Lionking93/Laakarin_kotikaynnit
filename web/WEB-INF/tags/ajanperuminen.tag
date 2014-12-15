@@ -11,6 +11,6 @@
 
 <%-- any content can be specified here e.g.: --%>
 <form>
-    <button type="submit">Peru aika</button>
+    <button class="btn btn-primary" type="submit">Peru aika</button>
     <input class="hidden" name="peruaika" value="${peruttavanAjanId}" />
 </form>

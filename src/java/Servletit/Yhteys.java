@@ -8,7 +8,7 @@ import javax.naming.NamingException;
 import javax.sql.DataSource;
 
 /**
- *
+ *Luokka, joka luo yhteyden tietokantaan
  * @author leo
  */
 public class Yhteys {

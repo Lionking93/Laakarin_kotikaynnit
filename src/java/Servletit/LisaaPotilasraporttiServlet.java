@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 /**
- *
+ *Servlet, joka vastaa lisääPotilasraportti.jsp-sivun toiminnasta. Hoitaa siis tilannetta, jossa lääkäri lisää potilaalle potilasraporttia.
  * @author leo
  */
 public class LisaaPotilasraporttiServlet extends LisaaPotilasTietoServlet {
@@ -41,7 +41,7 @@ public class LisaaPotilasraporttiServlet extends LisaaPotilasTietoServlet {
                     if (p.onkoKelvollinen()) {
                         p.lisaaKuvausKantaan();
                         lahetaTietoOnnistuneestaLisayksesta(request, "Potilasraportti lisätty onnistuneesti.");
-                        response.sendRedirect("potilaantiedot");
+                        response.sendRedirect("tyotehtavat");
                     } else {
                         Collection<String> virheet = p.getVirheet();
                         request.setAttribute("syotettyTeksti", p);

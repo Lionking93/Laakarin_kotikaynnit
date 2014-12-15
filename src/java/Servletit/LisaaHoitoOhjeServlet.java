@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 /**
- *
+ *Servlet, joka hoitaa tilannetta, jossa lääkäri antaa potilaalle hoito-ohjetta, vastaa lisaaHoitoOhje.jsp-sivun toiminnasta
  * @author leo
  */
 public class LisaaHoitoOhjeServlet extends LisaaPotilasTietoServlet {

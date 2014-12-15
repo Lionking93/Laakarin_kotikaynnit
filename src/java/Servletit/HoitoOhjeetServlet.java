@@ -4,7 +4,9 @@ import Mallit.HoitoOhje;
 import Mallit.Kayttaja;
 import Mallit.Varaus;
 import java.io.IOException;
+import java.sql.Date;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import javax.naming.NamingException;
@@ -13,7 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- *
+ *Servlet-luokka, joka vastaa Asiakas-käyttäjän Hoito-ohjeet -tabista
  * @author leo
  */
 public class HoitoOhjeetServlet extends EmoServlet {
@@ -40,11 +42,13 @@ public class HoitoOhjeetServlet extends EmoServlet {
                 }
                 List<HoitoOhje> hoitoOhjeet = HoitoOhje.haeHoitoOhjeetAsiakasIdlla(getKayttaja().getId());
                 List<Kayttaja> laakarit = new ArrayList<Kayttaja>();
+                List<String> paivamaarat = new ArrayList<String>();
                 for (HoitoOhje h : hoitoOhjeet) {
                     Varaus v = Varaus.haeVarausIdlla(h.getVarausId());
                     Kayttaja l = v.getLaakari();
                     laakarit.add(l);
                 }
+                muunnaLisaysajankohdatSuomalaisiksi(request, hoitoOhjeet);
                 request.setAttribute("hoitoOhjeet", hoitoOhjeet);
                 request.setAttribute("laakarit", laakarit);
             } catch (Exception e) {
@@ -92,5 +96,15 @@ public class HoitoOhjeetServlet extends EmoServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
+
+    public void muunnaLisaysajankohdatSuomalaisiksi(HttpServletRequest request, List<HoitoOhje> hoitoOhjeet) {
+        List<String> pvm = new ArrayList<String>();
+        for (HoitoOhje h : hoitoOhjeet) {
+            SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy hh:mm:ss");
+            String muokattava = format.format(h.getLisaysajankohta());
+            pvm.add(muokattava);
+        }
+        request.setAttribute("paivamaarat", pvm);
+    }
 
 }

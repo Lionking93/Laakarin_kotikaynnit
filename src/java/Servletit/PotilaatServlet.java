@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 /**
- *
+ *Listaa lääkäriaseman potilaat
  * @author leo
  */
 public class PotilaatServlet extends EmoServlet {

@@ -14,20 +14,26 @@
             <tr>
                 <th>Potilas</th>
                 <th>Varattu aika</th>
-                <th colspan="1">Oireiden kuvaus</th>
+                <th colspan="2">Oireiden kuvaus</th>
             </tr>
             <c:forEach var="tyo" items="${tyot}" varStatus="monesko">     
-                    <tr>
-                        <td><c:out value="${tyo.asiakas.nimi}" /></td>
-                        <td><c:out value="${tyo.paiva.paiva}, ${tyo.aikaslotti.aikaslotti}" /></td>
-                        <td><c:out value="${oireet[monesko.index].lisattavaTeksti}" /></td>
-                        <td>
-                            <form>
-                                <input class="hidden" name="varauksenId" value="${tyo.id}" />
-                                <button type="submit" name="kuittaus" value="${tyo.asiakas.id}">Kuittaa suoritetuksi</button>
-                            </form>
-                        </td>
-                    </tr>
+                <tr>
+                    <td><c:out value="${tyo.asiakas.nimi}" /></td>
+                    <td><c:out value="${tyo.paiva.paiva}, ${paivamaarat[monesko.index]}, ${tyo.aikaslotti.aikaslotti}" /></td>
+                    <td><c:out value="${oireet[monesko.index].lisattavaTeksti}" /></td>
+                    <td>
+                        <c:choose>
+                            <c:when test="${tyo.onkoSuoritettu == 'false'}">
+                                <form>
+                                    <button class="btn btn-primary" type="submit" name="kuittaus" value="${tyo.id}">Kuittaa suoritetuksi</button>
+                                </form>
+                            </c:when>
+                            <c:otherwise>
+                                <div class="alert alert-info">Suoritettu</div>
+                            </c:otherwise>
+                        </c:choose>
+                    </td>
+                </tr>
             </c:forEach>
         </table>
         <c:if test="${tyotehtavienTila != null}">

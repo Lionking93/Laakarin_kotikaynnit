@@ -8,7 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 /**
- *
+ *Servlet-luokka, joka vastaa asiakkaan lääkäriaikojen valitsemisesta
  * @author leo
  */
 public class ViikkoaikatauluServlet extends AikatauluServlet {

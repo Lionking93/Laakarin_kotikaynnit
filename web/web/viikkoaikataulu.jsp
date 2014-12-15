@@ -10,7 +10,6 @@
 <t:pohja kenenTili="Asiakas" aktiivinenTokaTab="active" ekaTab="Omat varaukset" tokaTab="Viikkoaikataulu" kolmasTab="Hoito-ohjeet">
     <div class="tab-pane active">
         <t:lukujarjestys infoteksti="Valitse alta itsellesi sopivat lääkäriajat">
-
         </t:lukujarjestys>
     </div>
 </t:pohja>

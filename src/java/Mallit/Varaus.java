@@ -22,14 +22,16 @@ public class Varaus {
     private Kayttaja asiakas;
     private Kayttaja laakari;
     private Date lisaysajankohta;
+    private boolean onkoSuoritettu;
 
-    public Varaus(int id, Paiva viikonpaiva, Aikaslotti aika, Kayttaja asiakas, Kayttaja laakari, Date lisaysajankohta) {
+    public Varaus(int id, Paiva viikonpaiva, Aikaslotti aika, Kayttaja asiakas, Kayttaja laakari, Date lisaysajankohta, boolean onkoSuoritettu) {
         this.id = id;
         this.paiva = viikonpaiva;
         this.aikaslotti = aika;
         this.asiakas = asiakas;
         this.laakari = laakari;
         this.lisaysajankohta = lisaysajankohta;
+        this.onkoSuoritettu = onkoSuoritettu;
     }
     
     public Varaus(ResultSet rs) throws SQLException, NamingException {
@@ -39,6 +41,7 @@ public class Varaus {
         this.asiakas = Kayttaja.haeKayttajaIdlla(rs.getInt("asiakas_id"));
         this.laakari = Kayttaja.haeKayttajaIdlla(rs.getInt("laakari_id"));
         this.lisaysajankohta = rs.getDate("lisaysajankohta");
+        this.onkoSuoritettu = rs.getBoolean("onkoSuoritettu");
     }
     
     public Varaus() {}
@@ -67,6 +70,10 @@ public class Varaus {
         return this.lisaysajankohta;
     }
     
+    public boolean getOnkoSuoritettu() {
+        return this.onkoSuoritettu;
+    }
+    
     public void setId(int uusiId){
         this.id = uusiId;
     }
@@ -91,9 +98,13 @@ public class Varaus {
         this.lisaysajankohta = uusiLisaysajankohta;
     }
     
+    public void setOnkoSuoritettu(boolean uusiOnkoSuoritettu) {
+        this.onkoSuoritettu = uusiOnkoSuoritettu;
+    }
+    
     public static Varaus haeVarausIdlla(int id) throws SQLException, NamingException {
         Connection yhteys = luoYhteys();
-        String sql = "SELECT id,  FROM Varaus WHERE varaus.id = ?";
+        String sql = "SELECT * FROM Varaus WHERE varaus.id = ?";
         PreparedStatement kysely = yhteys.prepareStatement(sql);
         kysely.setInt(1, id);
         ResultSet rs = kysely.executeQuery();
@@ -158,6 +169,18 @@ public class Varaus {
     public static void peruAika(int id) throws NamingException, SQLException {
         Connection yhteys = luoYhteys();
         String sql = "DELETE FROM Varaus WHERE id = ?";
+        PreparedStatement kysely = yhteys.prepareStatement(sql);
+        kysely.setInt(1, id);
+        
+        kysely.executeUpdate();
+        
+        try { kysely.close(); } catch (Exception e) {}
+        try { yhteys.close(); } catch (Exception e) {}
+    }
+    
+    public static void varausSuoritettu(int id) throws NamingException, SQLException {
+        Connection yhteys = luoYhteys();
+        String sql = "UPDATE Varaus SET onkoSuoritettu = 'true' WHERE id = ?";
         PreparedStatement kysely = yhteys.prepareStatement(sql);
         kysely.setInt(1, id);
         

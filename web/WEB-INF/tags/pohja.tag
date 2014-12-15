@@ -31,7 +31,7 @@
         <p>${kenenTili}</p>
         <div class="row">
             <div class="col-xs-10"><h2>Hei ${kayttajanNimi}! Tervetuloa käyttämään MediHome-ajanvarausjärjestelmää!</h2></div>
-            <div class="col-xs-2" id="kirjautuminen"><form><button type="submit" name="kirjauduUlos">Kirjaudu ulos</button></form></div>
+            <div class="col-xs-2" id="kirjautuminen"><form><button class="btn btn-primary" type="submit" name="kirjauduUlos">Kirjaudu ulos</button></form></div>
         </div>
         <br/>
         <div class="tabbable">

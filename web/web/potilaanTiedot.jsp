@@ -31,7 +31,7 @@
                 </table>
             </div>
             <div class="col-xs-2" id="kirjautuminen">
-                <form><input class="btn btn-default" type="submit" name="etusivulle" value="Palaa etusivulle" /></form>
+                <form><input class="btn btn-primary" type="submit" name="etusivulle" value="Palaa etusivulle" /></form>
             </div>
         </div>
         <div class="tabbable">
@@ -71,8 +71,8 @@
                                         <c:if test="${empty hoitoOhjeet[paikka.index].lisattavaTeksti}">
                                             <td>    
                                                 <form>
-                                                    <input class="hidden" name="hoitoOhjeenVarattavaAikaId" value="${oire.varattavaAikaId}" />
-                                                    <button class="btn btn-default" type="submit" name="lisaaHoitoOhje" value="${oire.asiakasId}">Lisää hoito-ohje</button>
+                                                    <input class="hidden" name="hoitoOhjeenVarattavaAikaId" value="${oire.varausId}" />
+                                                    <button class="btn btn-primary" type="submit" name="lisaaHoitoOhje" value="">Lisää hoito-ohje</button>
                                                 </form>
                                             </td>
                                         </c:if>
@@ -80,7 +80,7 @@
                                             <td>
                                                 <form>
                                                     <input class="hidden" name="hoitoOhjeenId" value="${hoitoOhjeet[paikka.index].id}" />
-                                                    <input class="btn btn-default" type="submit" name="poistaHoitoOhje" value="Poista hoito-ohje" />
+                                                    <input class="btn btn-primary" type="submit" name="poistaHoitoOhje" value="Poista hoito-ohje" />
                                                 </form>
                                             </td>
                                         </c:if>

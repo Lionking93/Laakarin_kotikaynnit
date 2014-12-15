@@ -1,6 +1,7 @@
 package Servletit;
 
 import Mallit.Kayttaja;
+import Mallit.Varaus;
 import java.io.IOException;
 import java.sql.Date;
 import java.sql.Timestamp;
@@ -90,16 +91,16 @@ public class EmoServlet extends HttpServlet {
     protected void asetaVirhe(String virhe, HttpServletRequest request) {
         request.setAttribute("virheViesti", virhe);
     }
-
+    //Koodi erilaisten viestien tuottamiseksi onnistuneista tietokantalisäyksistä
     protected void onnistunutLisays(String onnistui, HttpServletRequest request) {
         request.setAttribute("onnistunutLisays", onnistui);
     }
-
+    //Näyttää virhesivun, kun jokin koodissa menee pieleen
     public void naytaVirheSivu(String virheviesti, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         asetaVirhe(virheviesti, request);
         naytaSivu(request, response, "web/sqlVirheSivu.jsp");
     }
-
+    //Hakee kirjautuneen käyttäjän
     protected Kayttaja getKayttaja() {
         return kayttaja;
     }
@@ -122,20 +123,20 @@ public class EmoServlet extends HttpServlet {
             return false;
         }
     }
-
+    //Tarkistaa onko jotain nappia painettu
     protected boolean napinPainallus(String nappi, HttpServletRequest request) {
         return request.getParameter(nappi) != null;
     }
-
+    //Tarkistaa painetaanko kirjaudu ulos -nappia
     protected boolean kirjaudutaankoUlos(HttpServletRequest request) {
         return request.getParameter("kirjauduUlos") != null;
     }
-
+    //Asettaa jsp-sivulle kirjautuneen käyttäjän nimen
     protected void asetaSivunKayttajanNimi(HttpServletRequest request) {
         String kayttajanNimi = getKayttaja().getNimi();
         request.setAttribute("kayttajanNimi", kayttajanNimi);
     }
-
+    //Asiakas- ja lääkärikäyttäjillä hoitaa tabilta toiselle siirtymistä
     protected void avaaSivunakyma(HttpServletRequest request, HttpServletResponse response, String ekasivu, String tokasivu, String kolmassivu, String oletussivu) throws ServletException, IOException {
         asetaSivunKayttajanNimi(request);
         if (request.getParameter("ekaTab") != null) {
@@ -148,14 +149,14 @@ public class EmoServlet extends HttpServlet {
             naytaSivu(request, response, oletussivu);
         }
     }
-
+    //Luo sql Timestamp muotoisen luomisajankohdan, joka voidaan tallentaa tietokantaan
     protected Timestamp luoLisaysajankohta() {
         Calendar uusiPaiva = Calendar.getInstance();
         long nykyhetkiMillisekunneissa = uusiPaiva.getTimeInMillis();
         Timestamp tamaHetki = new Timestamp(nykyhetkiMillisekunneissa);
         return tamaHetki;
     }
-
+    //Lataa viisi ensimmäistä viikonpäivää
     protected static List<String> lataaPaivat(Calendar c) {
         List<String> viikonPaivat = new ArrayList<String>();
         DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
@@ -165,26 +166,34 @@ public class EmoServlet extends HttpServlet {
         }
         return viikonPaivat;
     }
-
+    //Hakee tämän päivän
     protected static Calendar haeTamaPaiva() {
         Calendar c = Calendar.getInstance();
         c.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
         c.add(Calendar.DATE, -1);
         return c;
     }
-
+    //Muuntaa tekstimuotoisen päivämäärän tietokantaan talletettavaksi kelpaavaan sql Date muotoon
     protected Date muunnaTyopaivamaara(String paiva) throws ParseException {
         DateFormat format = new SimpleDateFormat("dd.MM.yyyy");
         java.util.Date pvm = format.parse(paiva);
         java.sql.Date sqlPvm = new java.sql.Date(pvm.getTime());
         return sqlPvm;
     }
-
+    //Hakee kuluvan viikon viiden ensimmäisen päivän päivämäärät
     protected List<String> haeNykyisenViikonPaivamaarat(HttpServletRequest request) {
         Calendar c = haeTamaPaiva();
         HttpSession session = request.getSession();
         int kuinkaPaljon = Integer.parseInt((String) session.getAttribute("siirtyma"));
         c.add(Calendar.DATE, kuinkaPaljon * 7);
         return lataaPaivat(c);
+    }
+    //Muuntaa date-muotoiset päivämäärät suomalais-tyylisiksi
+    protected void muunnaPaivamaaratSuomalaisiksi(HttpServletRequest request, List<Varaus> ajat) {
+        List<String> paivamaarat = new ArrayList<String>();
+        for (Varaus v : ajat) {
+            paivamaarat.add(Varaus.muotoilePaivamaara(v.getLisaysajankohta()));
+        }
+        request.setAttribute("paivamaarat", paivamaarat);
     }
 }

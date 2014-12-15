@@ -64,6 +64,10 @@
         <servlet-name>PotilasTietoServlet</servlet-name>
         <servlet-class>Servletit.LisaaPotilasTietoServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>LuoTiliServlet</servlet-name>
+        <servlet-class>Servletit.LuoTiliServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>SQLTesti2</servlet-name>
         <url-pattern>/SQLTesti2</url-pattern>
@@ -127,6 +131,10 @@
     <servlet-mapping>
         <servlet-name>PotilasTietoServlet</servlet-name>
         <url-pattern>/PotilasTietoServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>LuoTiliServlet</servlet-name>
+        <url-pattern>/luouusitili</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

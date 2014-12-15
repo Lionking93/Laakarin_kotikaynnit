@@ -6,7 +6,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.naming.NamingException;
 
 /**
@@ -21,9 +24,9 @@ public class Kayttaja {
     private String nimi;
     private String tunnus;
     private String salasana;
-    private String syntymaaika;
     private String henkilotunnus;
     private String osoite;
+    private Map<String, String> virheet = new HashMap<String, String>();
 
     public Kayttaja(int id, int kayttoOikeus, String nimi, String tunnus, String salasana) throws NamingException {
         this.id = id;
@@ -41,9 +44,6 @@ public class Kayttaja {
         this.salasana = rs.getString("salasana");
         if (rs.getString("henkilotunnus") != null) {
             this.henkilotunnus = rs.getString("henkilotunnus");
-        }
-        if (rs.getDate("syntymaaika") != null) {
-            this.syntymaaika = rs.getDate("syntymaaika").toString();
         }
         if (rs.getString("osoite") != null) {
             this.osoite = rs.getString("osoite");
@@ -73,10 +73,6 @@ public class Kayttaja {
         return this.salasana;
     }
 
-    public String getSyntymaaika() {
-        return this.syntymaaika;
-    }
-
     public String getHenkilotunnus() {
         return this.henkilotunnus;
     }
@@ -95,26 +91,62 @@ public class Kayttaja {
 
     public void setNimi(String uusiNimi) {
         this.nimi = uusiNimi;
+
+        if (this.nimi.trim().length() == 0) {
+            virheet.put("nimi", "Nimi ei saa olla tyhjä!");
+        } else if (this.nimi.length() >= 50) {
+            virheet.put("nimi", "Nimi ei saa olla yli 50 merkkiä pitkä!");
+        } else {
+            virheet.remove("nimi");
+        }
     }
 
     public void setTunnus(String uusiTunnus) {
         this.tunnus = uusiTunnus;
+
+        if (this.tunnus.trim().length() == 0) {
+            virheet.put("tunnus", "Tunnus ei saa olla tyhjä!");
+        } else if (this.tunnus.length() >= 21) {
+            virheet.put("tunnus", "Tunnus ei saa olla yli 20 merkkiä pitkä!");
+        } else {
+            virheet.remove("tunnus");
+        }
     }
 
     public void setSalasana(String uusiSalasana) {
         this.salasana = uusiSalasana;
-    }
 
-    public void setSyntymaaika(String uusiSyntymaaika) {
-        this.syntymaaika = uusiSyntymaaika;
+        if (this.salasana.trim().length() == 0) {
+            virheet.put("salasana", "Salasana ei saa olla tyhjä!");
+        } else if (this.tunnus.length() >= 21) {
+            virheet.put("salasana", "Salasana ei saa olla yli 20 merkkiä pitkä!");
+        } else {
+            virheet.remove("salasana");
+        }
     }
 
     public void setHenkilotunnus(String uusiHenkilotunnus) {
         this.henkilotunnus = uusiHenkilotunnus;
+
+        if (this.henkilotunnus.trim().length() == 0) {
+            virheet.put("henkilotunnus", "Henkilötunnus ei saa olla tyhjä!");
+        } else if (this.henkilotunnus.length() >= 12) {
+            virheet.put("henkilotunnus", "Henkilötunnus ei saa olla yli 11 merkkiä pitkä!");
+        } else {
+            virheet.remove("henkilotunnus");
+        }
     }
 
     public void setOsoite(String uusiOsoite) {
         this.osoite = uusiOsoite;
+
+        if (this.osoite.trim().length() == 0) {
+            virheet.put("osoite", "Osoite ei saa olla tyhjä!");
+        } else if (this.osoite.length() >= 76) {
+            virheet.put("osoite", "Osoite ei saa olla yli 75 merkkiä pitkä!");
+        } else {
+            virheet.remove("osoite");
+        }
     }
 
     public static Kayttaja etsiKayttajaTunnuksilla(String username, String password) throws NamingException, SQLException {
@@ -164,7 +196,7 @@ public class Kayttaja {
         suljeResurssit(rs, kysely, yhteys);
         return asiakkaat;
     }
-    
+
     public static List<Kayttaja> etsiLaakaritJoillaEiOleToitaAikaslotissa(int aikaslotti, int paiva) throws NamingException, SQLException {
         Yhteys tietokanta = new Yhteys();
         Connection yhteys = tietokanta.getYhteys();
@@ -183,6 +215,23 @@ public class Kayttaja {
         return laakarit;
     }
     
+    public void luoKayttaja() throws NamingException, SQLException {
+        Yhteys tietokanta = new Yhteys();
+        Connection yhteys = tietokanta.getYhteys();
+        String sql = "INSERT INTO Kayttaja(kaytto_oikeus, nimi, tunnus, salasana, henkilotunnus, osoite) VALUES(?, ?, ?, ?, ?, ?) RETURNING id";
+        PreparedStatement kysely = yhteys.prepareStatement(sql);
+        kysely.setInt(1, this.getKayttoOikeus());
+        kysely.setString(2, this.getNimi());
+        kysely.setString(3, this.getTunnus());
+        kysely.setString(4, this.getSalasana());
+        kysely.setString(5, this.getHenkilotunnus());
+        kysely.setString(6, this.getOsoite());
+        ResultSet rs = kysely.executeQuery();
+        rs.next();
+        this.id = rs.getInt(1);
+        suljeResurssit(rs, kysely, yhteys);
+    }
+
     public static void suljeResurssit(ResultSet rs, PreparedStatement kysely, Connection yhteys) {
         try {
             rs.close();
@@ -196,5 +245,13 @@ public class Kayttaja {
             yhteys.close();
         } catch (Exception e) {
         }
+    }
+
+    public boolean onkoKelvollinen() {
+        return virheet.isEmpty();
+    }
+
+    public Collection<String> getVirheet() {
+        return virheet.values();
     }
 }

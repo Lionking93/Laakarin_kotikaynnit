@@ -18,7 +18,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 /**
- *
+ *Servlet, joka vastaa luoOirekuvaus.jsp-sivusta. Vastaa sekä uuden lääkärin ja asiakkaan välisen varauksen, 
+ * että uuden asiakkaan oirekuvauksen luomisesta
  * @author leo
  */
 public class OirekuvausServlet extends EmoServlet {
@@ -109,14 +110,14 @@ public class OirekuvausServlet extends EmoServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
-
+    //Asettaa ajanvarauksen tiedot asiakkaalle nähtäväksi oirekuvauksen luomissivulle
     public void asetaAjanvarauksenTiedot(HttpServletRequest request, HttpServletResponse response) throws NamingException, SQLException, ServletException, IOException {
         request.setAttribute("ajanPvm", haeVarausAjanPaivamaara(request, response));
         request.setAttribute("laakarinNimi", haeLaakari(request, response).getNimi());
         request.setAttribute("laakarinAika", haeAikaslotti(request, response).getAikaslotti());
         request.setAttribute("paiva", haePaiva(request, response).getPaiva());
     }
-
+    //Hakee asiakkaan viikkoaikataulussa valitseman päivän lääkärinajalle
     public Paiva haePaiva(HttpServletRequest request, HttpServletResponse response) throws NamingException, SQLException, ServletException, IOException {
         HttpSession session = request.getSession();
         Paiva paiva = null;
@@ -128,7 +129,7 @@ public class OirekuvausServlet extends EmoServlet {
         }
         return paiva;
     }
-
+    //Hakee asiakkaan viikkoaikataulussa lääkärinajalle valitseman kellonajan
     public Aikaslotti haeAikaslotti(HttpServletRequest request, HttpServletResponse response) throws NamingException, SQLException, ServletException, IOException {
         HttpSession session = request.getSession();
         Aikaslotti aikaslotti = null;
@@ -140,7 +141,7 @@ public class OirekuvausServlet extends EmoServlet {
         }
         return aikaslotti;
     }
-
+    //Hakee varaukseen liitetyn lääkärin
     public Kayttaja haeLaakari(HttpServletRequest request, HttpServletResponse response) throws NamingException, SQLException, ServletException, IOException {
         HttpSession session = request.getSession();
         Kayttaja laakari = null;
@@ -152,7 +153,7 @@ public class OirekuvausServlet extends EmoServlet {
         }
         return laakari;
     }
-
+    //Hakee päivämäärän, jolle asiakas varauksen haluaa
     public String haeVarausAjanPaivamaara(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
         String ajanPvm = "";
@@ -163,12 +164,12 @@ public class OirekuvausServlet extends EmoServlet {
         }
         return ajanPvm;
     }
-
+    //Lähettää tiedon onnistuneesta varauksesta eteenpäin OmatVarauksetServletille
     public void lahetaVaraustietoOmatVarauksetServletille(HttpServletRequest request) {
         HttpSession session = request.getSession();
         session.setAttribute("varaustieto", "Varaus lisätty onnistuneesti!");
     }
-
+    //Luo uuden lääkärin ja asiakkaan välisen varauksen
     public Varaus luoVaraus(HttpServletRequest request, HttpServletResponse response) throws NamingException, SQLException, ParseException, ServletException, IOException {
         Varaus v = new Varaus();
         v.setAikaslotti(haeAikaslotti(request, response));
@@ -178,7 +179,7 @@ public class OirekuvausServlet extends EmoServlet {
         v.setLisaysajankohta(muunnaTyopaivamaara(haeVarausAjanPaivamaara(request, response)));
         return v;
     }
-
+    //Luo uuden varaukseen liittyvän oirekuvauksen asiakkaalle
     public Oirekuvaus luoOirekuvaus(HttpServletRequest request) throws NamingException, SQLException {
         Oirekuvaus k = new Oirekuvaus();
         k.setLisaysajankohta(luoLisaysajankohta());

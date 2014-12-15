@@ -14,8 +14,8 @@
         <table class="table table-striped">
             <tr>
                 <th>Vastaava lääkäri</th>
-                <th colspan="2">Varauksen ajankohta</th>
-                <th>Oirekuvaus</th>
+                <th>Varauksen ajankohta</th>
+                <th colspan="2">Oirekuvaus</th>
             </tr>
             <c:forEach var="varaus" items="${varaukset}" varStatus="moneskoVaraus">
                 <tr>

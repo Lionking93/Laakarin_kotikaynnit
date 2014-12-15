@@ -12,6 +12,6 @@
               tekstikentanSisalto="Kirjoita allaolevaan tekstikenttään uusi potilasraportti tai hoito-ohje, 
             tai muokkaa jo olemassaolevia tietoja.">
     <div>
-        <input class="btn btn-default" name="potilasraportti" value="Lisää potilasraportti" type="submit" />
+        <input class="btn btn-primary" name="potilasraportti" value="Lisää potilasraportti" type="submit" />
     </div>
 </t:lisaaTieto>
